@@ -4,7 +4,7 @@
             <li class="nav-title">BILLING</li>
             <li class="nav-item">
                 <a class="nav-link" href="<?php echo base_url('billing/billingDashboard');?>">
-                <i class="nav-icon icon-drop"></i> Billing Dashboard</a>
+                <i class="cil-wallet"></i> Billing Dashboard</a>
             </li>            
         </ul>
     </nav>

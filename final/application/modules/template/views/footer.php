@@ -1,7 +1,7 @@
 <footer class="app-footer">
     <div>
-    <a href="https://coreui.io">CoreUI</a>
-    <span>© 2018 creativeLabs.</span>
+    © <a href="http://alubijidwaterbillingsys.com">AWBS</a>
+
     </div>
     <div class="ml-auto">
     <span>Powered by</span>
