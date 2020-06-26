@@ -49,7 +49,14 @@ class Admin extends MY_Controller {
  
     function verify(){
 
-        print_r($this->AdminModel->verified('2020100100'));
+        $app = array(
+            "accId" => $this->input->post("id"),
+            "is_verified" => $this->input->post("stat"),
+        );
+
+        $response = $this->AdminModel->verified($app);
+
+        print_r(json_encode($response));
     }
     
     
@@ -78,13 +85,54 @@ class Admin extends MY_Controller {
 
     }
 
+    function employeeList(){
+
+        $data['employees'] = $this->AdminModel->getWhereEmployee(1) ;
+
+
+        $data['title'] = 'Employee Master list';
+        $data['modules'] = 'admin';
+        $data['sidebar']='sidebar/adminSidebar';
+        $data['main_content'] = 'employeeList';
+        echo Modules::run('template/main_content', $data);
+    }
+
+    function employeeDetails($id){
+
+        // $data['Details'] = ;
+
+
+        $data['title'] = 'Employee Master list';
+        $data['modules'] = 'admin';
+        $data['sidebar']='sidebar/adminSidebar';
+        $data['main_content'] = 'employeeDetails';
+        echo Modules::run('template/main_content', $data);
+    }
+
+    function pendingEmployees(){
+
+        $data['employees'] = $this->AdminModel->getWhereEmployee(0) ;
+
+        $data['title'] = 'Pending Employee list';
+        $data['modules'] = 'admin';
+        $data['sidebar']='sidebar/adminSidebar';
+        $data['main_content'] = 'pendingEmployees';
+        echo Modules::run('template/main_content', $data);
+    }
+
+
+
 
     function saveEmployee(){
         if(!empty($this->input->post())){
 
+            $table = 'account';
+            $pk = 'accId';
+            $accId = $this->checkID($table, $pk);
+
             $account = array(
                 
-                'accId' => 2020100102,
+                'accId' => $accId,
                 'email' =>  $this->input->post('email'),
                 'password' =>  $this->input->post('password'),
                 'user_type_Id' =>  $this->input->post('position'),
@@ -104,7 +152,7 @@ class Admin extends MY_Controller {
         $checkID = false;
         while($checkID == false){
             $acc_id = $this->idGenerator();
-            $checkID = $this->Admin->idChecker($table, $pkeyName, $acc_id);
+            $checkID = $this->AdminModel->idChecker($table, $pkeyName, $acc_id);
         }
 
         return $acc_id;

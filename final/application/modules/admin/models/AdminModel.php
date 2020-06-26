@@ -58,6 +58,17 @@ class AdminModel extends CI_Model {
 
     }
 
+    function getWhereEmployee($stat){
+        
+        $this->db->select('*');
+        $this->db->from('account');
+        $this->db->join('user_type', 'account.user_type_Id = user_type.user_type_Id');
+        $this->db->where('is_verified', $stat);
+
+        $query = $this->db->get();
+        return $query->result();
+    }
+
 
     function saveEmployee($emp){
         
@@ -74,21 +85,37 @@ class AdminModel extends CI_Model {
 
 
     }
-    // function verified($id){
 
-    //     $this->db->where('accId', $id);
 
-    //     if ($this->db->update('account', array('is_verified' => 1) )) {
-    //         return $response = array( 'msg' => 'success' );
+    public function idChecker($tbl, $pk, $id){
+        $this->db->select($pk);
+        $this->db->from($tbl);
+        $this->db->where($pk, $id );
+        $query = $this->db->get()->result();
+        
+        if($query == null && $query != 0){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    function verified($acc){
+
+        $this->db->where('accId', $acc['accId']);
+
+        if ($this->db->update('account', $acc )) {
+            return $response = array( 'msg' => 'success' );
             
     
-    //     }
-    //     else{
-    //         return $response = array( 'code' => 'Operation failed' );
+        }
+        else{
+            return $response = array( 'code' => 'Operation failed' );
             
 
-    //     }
-    // }
+        }
+    }
 
 
 

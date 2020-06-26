@@ -1,6 +1,14 @@
 <div class="card px-3">
     
-    <div class="row justify-content-end mt-5">
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <h2>Add Employee</h2>
+            <hr>
+        </div>
+    </div>
+    
+    <div class="row justify-content-end mt-2">
+        
         <div class="col-md-1">
             <button class="btn btn-success" id="save">Save</button>
         </div>
@@ -127,9 +135,10 @@
             url:'<?php echo base_url('admin/saveEmployee');?>',
             success: function(datas){
 
-                // var data = $.parseJSON(datas);
+                var data = $.parseJSON(datas);
                 
-                console.log(datas);
+                // console.log(datas);
+                alert(data.msg);
                 
             },
             error: function(){
