@@ -15,6 +15,21 @@ class Login extends MY_Controller {
 	{
         if($this->session->is_logged_in){
             $this->goDash($this->session->type_id);
+            switch ($this->session->type_id) {
+              case 1:
+                redirect('admin/adminDashboard');
+                break;
+              case 2:
+                redirect('billing/billingDashboard');
+                break;
+              case 3:
+                redirect('cashier/cashierDashboard');
+                break;
+              case 4:
+                redirect('accounts/accountsDashboard');
+                break;
+        
+        }
         }else{
 
             $data['title'] = 'Login';
