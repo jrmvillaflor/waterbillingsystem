@@ -26,7 +26,6 @@
         <link type="text/css" rel="stylesheet" href="<?php echo base_url("assets/main/jquery/jqueryUI/jquery-ui.css")?>" >
 
         <script type="text/javascript" src="<?php echo base_url("assets/main/jquery/jquery-3.5.1.min.js")?>"></script>
-         <script type="text/javascript" src="<?php echo base_url("assets/main/js/bootstrap.min.js")?>"></script>
         <script type="text/javascript" src="<?php echo base_url("assets/main/jquery-ui.js")?>"></script>
 
         <!-- CORE UI js -->
