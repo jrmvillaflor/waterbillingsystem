@@ -14,10 +14,13 @@
                 <a class="nav-link" href="<?php echo base_url('admin/dashboards');?>">
                     <i class="nav-icon icon-drop"></i> Dashboards</a>
             </li>
+            <li class="nav-title ">EMPLOYEE</li>
             <li class="nav-item">
                 <a class="nav-link" href="<?php echo base_url('admin/addEmployee');?>">
                     <i class="nav-icon icon-drop"></i>Add Employee</a>
             </li>
+
+
         </ul>
     </nav>
 
