@@ -10,6 +10,19 @@ class Accounts extends MY_Controller {
         if($this->session->is_logged_in == false){
             redirect('login');
         }
+
+        switch ($this->session->type_id) {
+          case 1:
+            redirect('admin/adminDashboard');
+            break;
+          case 2:
+            redirect('billing/billingDashboard');
+            break;
+          case 3:
+            redirect('cashier/cashierDashboard');
+            break;
+        
+        }
     }
 	
     

@@ -12,6 +12,19 @@ class Cashier extends MY_Controller {
             redirect('login');
         }
 
+        switch ($this->session->type_id) {
+          case 1:
+            redirect('admin/adminDashboard');
+            break;
+          case 2:
+            redirect('billing/billingDashboard');
+            break;
+          case 4:
+            redirect('accounts/accountsDashboard');
+            break;
+        
+        }
+
     }
 	
     
