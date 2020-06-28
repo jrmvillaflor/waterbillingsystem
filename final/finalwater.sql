@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 26, 2020 at 06:35 AM
+-- Generation Time: Jun 28, 2020 at 06:10 AM
 -- Server version: 5.7.29-0ubuntu0.18.04.1
 -- PHP Version: 5.6.40-21+ubuntu18.04.1+deb.sury.org+1
 
@@ -41,7 +41,16 @@ CREATE TABLE `account` (
 INSERT INTO `account` (`accId`, `password`, `email`, `user_type_Id`, `is_verified`) VALUES
 ('2020100100', 'guilaran', 'maykil@gmail.com', 1, 1),
 ('2020100102', '123', 'billing@gmail.com', 2, 1),
-('2020218521', '1234', 'testing@gmail.com', 3, 1);
+('2020218521', '1234', 'testing@gmail.com', 3, 1),
+('2020218522', '123123', 'accounts@gmail.com', 4, 1),
+('2020076740', '123', 'cashier@gmail.com', 3, 1),
+('2020488926', '123', 'cashier@gmail.com', 3, 1),
+('2020174381', '1111', 'teasdas', 1, 1),
+('2020764404', '123', '123131', 1, 1),
+('2020520921', '123', 'casheir@gmail.com', 3, 1),
+('2020466640', '123', 'casheir@gmail.com', 3, 1),
+('2020551859', '123', 'sada', 1, 1),
+('2020251880', 'asd', 'asdas', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -366,8 +375,18 @@ CREATE TABLE `employee_profile` (
   `lastname` varchar(255) NOT NULL,
   `gender` text NOT NULL,
   `contactNo` int(11) NOT NULL,
-  `emp_address_id` varchar(255) NOT NULL
+  `accId` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `employee_profile`
+--
+
+INSERT INTO `employee_profile` (`emp_id`, `firstname`, `lastname`, `gender`, `contactNo`, `accId`) VALUES
+('2020520921-prof', 'TEST', 'TESTING', 'Male', 981238990, '2020520921'),
+('2020466640-prof', 'TEST', 'TESTING', 'Male', 981238990, '2020466640'),
+('2020551859-prof', 'fname', 'lname', 'Male', 98766578, '2020551859'),
+('2020251880-prof', 'fname', 'lname', 'Male', 2147483647, '2020251880');
 
 -- --------------------------------------------------------
 
@@ -376,11 +395,21 @@ CREATE TABLE `employee_profile` (
 --
 
 CREATE TABLE `emp_address` (
-  `emp_address_id` varchar(255) NOT NULL,
   `emp_street` varchar(255) NOT NULL,
   `emp_barangay` varchar(255) NOT NULL,
-  `emp_city` varchar(255) NOT NULL
+  `emp_city` varchar(255) NOT NULL,
+  `emp_id` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `emp_address`
+--
+
+INSERT INTO `emp_address` (`emp_street`, `emp_barangay`, `emp_city`, `emp_id`) VALUES
+('3', 'Poblacion', 'Alubijid', '2020520921-prof'),
+('3', 'Poblacion', 'Alubijid', '2020466640-prof'),
+('1', 'dasda', 'asdadsad', '2020551859-prof'),
+('1', 'as', 'asdasd', '2020251880-prof');
 
 -- --------------------------------------------------------
 
@@ -426,20 +455,21 @@ CREATE TABLE `meter_reading` (
   `date_of_reading` date NOT NULL,
   `reading_value` varchar(255) NOT NULL,
   `customer_account_id` varchar(255) NOT NULL,
-  `print` int(11) NOT NULL
+  `print` int(11) NOT NULL,
+  `is_recieved` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `meter_reading`
 --
 
-INSERT INTO `meter_reading` (`meter_reading_id`, `date_of_reading`, `reading_value`, `customer_account_id`, `print`) VALUES
-('1', '2020-04-20', '0', '20200067462020-LGO', 0),
-('2', '2020-05-20', '15', '20200067462020-LGO', 0),
-('3', '2020-06-20', '50', '20200067462020-LGO', 0),
-('4', '2020-07-20', '70', '20200067462020-LGO', 0),
-('5', '2020-08-20', '120', '20200067462020-LGO', 0),
-('6', '2020-09-20', '150', '20200067462020-LGO', 0);
+INSERT INTO `meter_reading` (`meter_reading_id`, `date_of_reading`, `reading_value`, `customer_account_id`, `print`, `is_recieved`) VALUES
+('1', '2020-04-20', '0', '20200067462020-LGO', 0, 0),
+('2', '2020-05-20', '15', '20200067462020-LGO', 0, 0),
+('3', '2020-06-20', '50', '20200067462020-LGO', 0, 0),
+('4', '2020-07-20', '70', '20200067462020-LGO', 0, 0),
+('5', '2020-08-20', '120', '20200067462020-LGO', 0, 0),
+('6', '2020-09-20', '150', '20200067462020-LGO', 0, 0);
 
 -- --------------------------------------------------------
 
