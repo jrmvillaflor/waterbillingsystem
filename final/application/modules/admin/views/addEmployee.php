@@ -52,6 +52,7 @@
         <div class="card-body mx-3">
 
             <div class="row">
+                <input type="hidden" id="empID" value="">
                 <div class="form-group col-md-6">
                     <label for="">First Name</label>
                     <input type="text" class="form-control" id="fname" placeholder="Enter your First Name" name="fname">
@@ -65,13 +66,13 @@
                 <div class="form-group col-md-6">
                     <label for="">Gender</label>
                     <select name="gender" id="gender" class="form-control">
-                        <option value="">Male</option>
-                        <option value="">Female</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
                     </select>
                 </div>
                 <div class="form-group col-md-6">
                     <label for="">Contact Number</label>
-                    <input type="text" class="form-control" placeholder="Contact Number" name="contact">
+                    <input type="text" class="form-control" placeholder="Contact Number" id="contact">
                 </div>
             </div>
             <div class="row">
@@ -81,15 +82,15 @@
                 </div>
                 <div class="form-group col-md-4">
                     <label for="">Street</label>
-                    <input type="text" class="form-control" placeholder="Enter your First Name" name="fname">
+                    <input type="text" class="form-control" placeholder="Enter your First Name" id="street">
                 </div>
                 <div class="form-group col-md-4">
                     <label for="">Barangay</label>
-                    <input type="text" class="form-control" placeholder="Enter your First Name" name="fname">
+                    <input type="text" class="form-control" placeholder="Enter your First Name" id="barangay">
                 </div>
                 <div class="form-group col-md-4">
-                    <label for="">City/Province</label>
-                    <input type="text" class="form-control" placeholder="Enter your Last Name" name="lname">
+                    <label for="">City/Municipality</label>
+                    <input type="text" class="form-control" placeholder="Enter your Last Name" id="city">
                 </div>
             </div>
         </div>
@@ -101,26 +102,42 @@
 
     $("#save").on('click', function(){
         
+        //account 
         var email = $("#email").val();
         var password = $("#password").val();
-        
         var pos = $("#pos").val();
-
         var pwd = $("#pwd").val();
-        console.log(pos);
+
+        //profile
+        var fname = $("#fname").val();
+        var lname = $("#lname").val();
+        var gender = $("#gender").val();
+        var contact = $("#contact").val();
+        var street = $("#pos").val();
+        var barangay = $("#barangay").val();
+        var city = $("#city").val();
+
         if(email != '' && password != '' && pwd != ''){
             if(password == pwd){
                 var details = {
                     email: email,
                     password: password,
-                    position: pos
+                    position: pos,
+                    fname: fname,
+                    lname: lname,
+                    gender: gender,
+                    contact: contact,
+                    street: street,
+                    barangay: barangay,
+                    city: city
+                    
                 };
                 saveData(details);
             }else{
                 alert('password did not matched')
             }
         }else{
-            alert("enter your Email");
+            alert("Please fillup all the fields");
         }
 
         
@@ -135,10 +152,8 @@
             url:'<?php echo base_url('admin/saveEmployee');?>',
             success: function(datas){
 
-                var data = $.parseJSON(datas);
-                
-                // console.log(datas);
-                alert(data.msg);
+                // var data = $.parseJSON(datas);
+                location.reload();
                 
             },
             error: function(){

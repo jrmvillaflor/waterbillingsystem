@@ -58,6 +58,30 @@ class AdminModel extends CI_Model {
 
     }
 
+    function getAccount($id){
+
+        $this->db->select("*");
+        $this->db->from("account");
+        $this->db->join("user_type", "account.user_type_id = user_type.user_type_id");
+        $this->db->where('account.accId', $id);
+
+        $query = $this->db->get();
+        return $query->result();
+
+    }
+
+    function getProfile($id){
+
+        $this->db->select("*");
+        $this->db->from("employee_profile");
+        $this->db->join("emp_address", "employee_profile.emp_id = emp_address.emp_id");
+        $this->db->where('accId', $id);
+
+        $query = $this->db->get();
+        return $query->result();
+
+    }
+
     function getWhereEmployee($stat){
         
         $this->db->select('*');
@@ -70,10 +94,10 @@ class AdminModel extends CI_Model {
     }
 
 
-    function saveEmployee($emp){
+    function saveEmployee($emp,$tbl){
         
-        if ($this->db->insert('account', $emp)) {
-            return $response = array( 'msg' => 'success' );
+        if ($this->db->insert($tbl, $emp)) {
+            return TRUE;
             
     
         }

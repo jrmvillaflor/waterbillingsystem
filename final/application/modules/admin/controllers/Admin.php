@@ -99,8 +99,8 @@ class Admin extends MY_Controller {
 
     function employeeDetails($id){
 
-        // $data['Details'] = ;
-
+        $data['profile'] = $this->AdminModel->getProfile($id);
+        $data['account'] = $this->AdminModel->getAccount($id);
 
         $data['title'] = 'Employee Master list';
         $data['modules'] = 'admin';
@@ -138,11 +138,52 @@ class Admin extends MY_Controller {
                 'user_type_Id' =>  $this->input->post('position'),
                 'is_verified' =>  1,
             );
+            $table = "account";
 
             // var_dump(json_encode($account));
-            $response = $this->AdminModel->saveEmployee($account);
+            $response = $this->AdminModel->saveEmployee($account,$table);
 
-            var_dump(json_encode($response));
+            if($response){
+
+                $profile = array(
+
+                    'emp_id' => $accId.'-prof',
+                    'firstname' => $this->input->post('fname'),
+                    'lastname' => $this->input->post('lname'),
+                    'gender' => $this->input->post('gender'),
+                    'contactNo' => $this->input->post('contact'),
+                    'accId' => $accId,
+                );
+
+                $table = "employee_profile";
+                $response = $this->AdminModel->saveEmployee($profile,$table);
+
+                if($response){
+
+                    $address = array(
+
+                        "emp_street" => $this->input->post('street'),
+                        "emp_barangay" => $this->input->post('barangay'),
+                        "emp_city" => $this->input->post('city'),
+                        'emp_id' => $accId.'-prof',
+
+                    );
+
+                    $table = "emp_address";
+                    $response = $this->AdminModel->saveEmployee($address,$table);
+
+                    if($response){
+                        var_dump(json_encode(array( 'msg' => 'success')));
+                    }
+
+                }else{
+                    var_dump(json_encode($response));
+                }
+
+            }else{
+                var_dump(json_encode($response));
+            }
+            
         }
     }
 
