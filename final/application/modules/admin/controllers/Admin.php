@@ -11,18 +11,6 @@ class Admin extends MY_Controller {
             redirect('login');
         } 
 
-        switch ($this->session->type_id) {
-          case 2:
-            redirect('billing/billingDashboard');
-            break;
-          case 3:
-            redirect('cashier/cashierDashboard');
-            break;
-          case 4:
-            redirect('accounts/accountsDashboard');
-            break;
-      
-        }
     }
 	
     public function dashboards(){
