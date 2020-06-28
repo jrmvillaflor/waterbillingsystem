@@ -8,7 +8,7 @@
     <?php 
         // kung mag open sa login kani e butang ni $this->session->userdata('is_logged_in')
         // kung kung dili e true lang sa ninyo 
-        if ($this->session->userdata('is_logged_in')):
+        if (true):
             $this->load->view('topNav');
         endif; 
     ?>
@@ -18,7 +18,7 @@
         <?php 
             // kung mag open sa login kani e butang ni $this->session->userdata('is_logged_in')
             // kung kung dili e true lang sa ninyo 
-            if ($this->session->userdata('is_logged_in')):
+            if (true):
                 $this->load->view($sidebar);
             endif;
         ?>
@@ -47,6 +47,6 @@
 <?php
     // kung mag open sa login kani e butang ni $this->session->userdata('is_logged_in')
     // kung kung dili e true lang sa ninyo 
-    if ($this->session->userdata('is_logged_in')):
+    if (true):
         echo Modules::run('template/footer');
     endif;
