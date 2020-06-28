@@ -2,10 +2,9 @@
     <button class="navbar-toggler sidebar-toggler d-lg-none mr-auto" type="button" data-toggle="sidebar-show">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <a class="navbar-brand" href="#">
-        <img class="navbar-brand-full" src="<?php echo base_url('assets/brand/coreui.svg');?>" alt="CoreUI Logo" width="89" height="25">
-        <img class="navbar-brand-minimized" src="img/brand/sygnet.svg" alt="CoreUI Logo" width="30" height="30">
-    </a>
+    <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
+        <img class="float-left pl-5" src="<?php echo base_url('assets/images/awbs-desktop.png');?>" width="120"></img>
+    </button>
     <!-- <button class="navbar-toggler sidebar-toggler" type="button" data-toggle="sidebar-show">
         <span class="navbar-toggler-icon"></span>
     </button> -->
@@ -17,7 +16,7 @@
                 <img class="img-avatar" src="<?php echo base_url('assets/images/man.png') ;?>" alt="admin">
             </a>
             <div class="dropdown-menu dropdown-menu-right">
-<<<<<<< HEAD
+
                 <div class="dropdown-header text-center">
                     <strong>Account</strong>
                 </div>
@@ -27,17 +26,7 @@
           </div>
       </li>
 
-=======
-            <div class="dropdown-header text-center">
-                <strong>Account</strong>
-            </div>
 
-            <div class="divider"></div>
-            <a class="dropdown-item" href="<?php echo base_url('login/logout')?>">
-                <i class="fa fa-lock"></i> Logout</a>
-            </div>
-        </li>
->>>>>>> 3ee59fd207bc6cf4bf8b3dab3af253e23ab85813
     </ul>
       
          
