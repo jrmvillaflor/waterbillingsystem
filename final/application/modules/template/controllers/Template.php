@@ -6,6 +6,8 @@ class Template extends MY_Controller {
     function __construct()
     {
         parent::__construct();
+
+
     }
 	
 
@@ -15,6 +17,9 @@ class Template extends MY_Controller {
         $this->load->view('header', $data);
  
     }
+
+     
+    
 
 
     public function main_content($data){

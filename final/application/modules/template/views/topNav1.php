@@ -23,7 +23,7 @@
                 <div class="divider"></div>
                 <a class="dropdown-item" href="<?php echo base_url('login/logout')?>">
                     <i class="fa fa-lock"></i> Logout</a>
-            </div>
+          </div>
       </li>
 
     </ul>

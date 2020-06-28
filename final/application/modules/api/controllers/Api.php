@@ -8,6 +8,23 @@ class Api extends MY_Controller {
         parent::__construct();
         $this->load->model('ApiModel');
 
+        switch ($this->session->type_id) {
+          case 1:
+            redirect('admin/adminDashboard');
+            break;
+          case 2:
+            redirect('billing/billingDashboard');
+            break;
+          case 3:
+            redirect('cashier/cashierDashboard');
+            break;
+          case 4:
+            redirect('accounts/accountsDashboard');
+            break;
+          default:
+            redirect('login');
+        }
+
     }
 
     public function index(){
