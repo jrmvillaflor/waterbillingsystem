@@ -17,6 +17,7 @@
                 <img class="img-avatar" src="<?php echo base_url('assets/images/man.png') ;?>" alt="admin">
             </a>
             <div class="dropdown-menu dropdown-menu-right">
+<<<<<<< HEAD
                 <div class="dropdown-header text-center">
                     <strong>Account</strong>
                 </div>
@@ -26,6 +27,17 @@
           </div>
       </li>
 
+=======
+            <div class="dropdown-header text-center">
+                <strong>Account</strong>
+            </div>
+
+            <div class="divider"></div>
+            <a class="dropdown-item" href="<?php echo base_url('login/logout')?>">
+                <i class="fa fa-lock"></i> Logout</a>
+            </div>
+        </li>
+>>>>>>> 3ee59fd207bc6cf4bf8b3dab3af253e23ab85813
     </ul>
       
          

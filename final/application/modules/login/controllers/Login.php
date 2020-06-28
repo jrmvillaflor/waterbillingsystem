@@ -93,11 +93,11 @@ class Login extends MY_Controller {
 
         elseif($uID == 3):
 
-            redirect('/casheir/cashierDashboard');
+            redirect('/cashier/cashierDashboard');
 
         elseif($uID == 4):
 
-            redirect('/accounts/accountsDashboard');
+            redirect('/accounts/newCustomer');
 
         elseif($uID == 5):
             
