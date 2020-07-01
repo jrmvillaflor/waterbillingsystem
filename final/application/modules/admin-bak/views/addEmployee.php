@@ -152,9 +152,7 @@
             url:'<?php echo base_url('admin/saveEmployee');?>',
             success: function(datas){
 
-                var data = $.parseJSON(datas);
-                alert(data.msg);
-
+                // var data = $.parseJSON(datas);
                 location.reload();
                 
             },

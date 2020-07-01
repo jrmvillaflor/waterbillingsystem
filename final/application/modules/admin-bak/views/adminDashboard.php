@@ -73,7 +73,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <canvas id="sampleChart" width="100%" height="30"></canvas>
+                        <canvas id="sampleChart" width="200" height="200"></canvas>
                     </div>
                 </div>
             </div>     

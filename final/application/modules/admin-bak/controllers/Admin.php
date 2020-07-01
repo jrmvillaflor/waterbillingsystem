@@ -9,6 +9,19 @@ class Admin extends MY_Controller {
         $this->load->model('AdminModel');
         if($this->session->is_logged_in == false){
             redirect('login');
+        } 
+
+        switch ($this->session->type_id) {
+          case 2:
+            redirect('billing/billingDashboard');
+            break;
+          case 3:
+            redirect('cashier/cashierDashboard');
+            break;
+          case 4:
+            redirect('accounts/accountsDashboard');
+            break;
+      
         }
     }
 	
@@ -107,8 +120,6 @@ class Admin extends MY_Controller {
         $data['sidebar']='sidebar/adminSidebar';
         $data['main_content'] = 'employeeDetails';
         echo Modules::run('template/main_content', $data);
-
-        // print_r($data['profile']);
     }
 
     function pendingEmployees(){
@@ -122,194 +133,8 @@ class Admin extends MY_Controller {
         echo Modules::run('template/main_content', $data);
     }
 
-    function addCustomer(){
-
-        $data['title'] = 'Add Customer';
-        $data['modules'] = 'admin';
-        $data['sidebar']='sidebar/adminSidebar';
-        $data['main_content'] = 'addCustomer';
-        echo Modules::run('template/main_content', $data);
-    }
-
-    function cubicRate(){
-
-        $data['types'] = $this->AdminModel->getData('account_type');;
-
-        $data['title'] = 'Cubic range and Rates';
-        $data['modules'] = 'admin';
-        $data['sidebar']='sidebar/adminSidebar';
-        $data['main_content'] = 'cubicRange';
-        echo Modules::run('template/main_content', $data);
-    }
-
-    function addDue(){
-
-        $data['title'] = 'Add Due Dates';
-        $data['modules'] = 'admin';
-        $data['sidebar']='sidebar/adminSidebar';
-        $data['main_content'] = 'addDue';
-        echo Modules::run('template/main_content', $data);
-    }
-
-    function saveDue(){
-
-        $due = array(
-            "due_desc" => $this->input->post("due_desc"),
-            "due_days" => $this->input->post("due_days"),
-        );
-
-        $tbl = "due_dates";
-
-        $response = $this->AdminModel->doInsert($tbl,$due);
-
-        if($response){
-            print_r(json_encode(array("msg" => "Success")));
-
-        }
-    }
 
 
-
-
-    function addHoliday(){
-
-        $data['title'] = 'Add Holiday';
-        $data['modules'] = 'admin';
-        $data['sidebar']='sidebar/adminSidebar';
-        $data['main_content'] = 'addHoliday';
-        echo Modules::run('template/main_content', $data);
-    }
-
-
-
-    function getDue(){
-
-        $due = $this->AdminModel->getData('due_dates');
-
-        print_r(json_encode($due));
-    }
-
-    function updateDue(){
-
-        $due = array(
-            'due_id' => $this->input->post('due_id'),
-            'due_days' => $this->input->post('due_days'),
-        );
-        $tbl = "due_dates";
-        $pk = "due_id";
-
-        $response = $this->AdminModel->doUpdate($tbl,$due,$pk);
-
-        print_r(json_encode($response));
-    }
-
-    function deleteDue(){
-
-        $response = $this->AdminModel->doDelete($this->input->post("due_id"));
-
-        print_r(json_encode($response));
-
-    }
-
-
-
-    function getHoliday(){
-
-        $holiday = $this->AdminModel->getHoliday();
-
-        print_r(json_encode($holiday));
-
-    }
-
-    function updateHoliday(){
-
-        $holiday = array(
-            'holiday_id' => $this->input->post('holiday_id'),
-            'holiday_name' => $this->input->post('holiday_name'),
-            'holiday_date' => $this->input->post('holiday_date'),
-        );
-        $tbl = "holiday";
-        $pk = "holiday_id";
-
-        $response = $this->AdminModel->doUpdate($tbl,$holiday,$pk);
-
-
-        print_r(json_encode($response));
-    }
-
-    function deleteHoliday(){
-
-        $response = $this->AdminModel->doDelete($this->input->post("holiday_id"));
-
-        print_r(json_encode($response));
-
-    }
-
-    function saveHoliday(){
-
-        $holiday = array(
-
-            "holiday_name" => $this->input->post("holiday_name"),
-            "holiday_date" => $this->input->post("holiday_date"),
-        );
-        $tbl = "holiday";
-
-        $response = $this->AdminModel->doInsert($tbl,$holiday);
-
-        if($response){
-            print_r(json_encode(array("msg" => "Success")));
-
-        }
-
-    }
-
-    function test(){
-        $response = array( 'msg' => 'success' );
-
-        echo $response['msg'];
-    }
-
-    function getCubicRates(){
-
-        $response = $this->AdminModel->getCubicRates($this->input->post("acc_type"));
-
-        print_r(json_encode($response));
-    }
-
-    function updateCubicRates(){
-
-        $cubic = array(
-            'cubic_range_id' => $this->input->post('cubic_id'),
-            'cubic_range_from' => $this->input->post('cubic_from'),
-            'cubic_range_to' => $this->input->post('cubic-to'),
-        );
-        $tbl = "cubic_range";
-        $pk = "cubic_range_id";
-
-        $response = $this->AdminModel->doUpdate($tbl,$cubic,$pk);
-
-        if($response['msg']){
-            $price = array(
-                'account_type_price' => $this->input->post('cubic_id'),
-                'account_type_code' => $this->input->post('cubic_code'),
-                'cubic_range_id' => $this->input->post('cubic_id')
-            );
-            $tbl = "account_type_fees";
-            $pk = "cubic_range_id";
-    
-            $response = $this->AdminModel->doUpdate($tbl,$price,$pk);
-
-            if($response['msg']){
-                print_r(json_encode($response));
-            }else{
-                print_r(json_encode(array("msg" => "price failed")));
-            }
-        }else{
-            print_r(json_encode(array("msg" => "Cubic failed")));
-        }
-       
-
-    }
 
     function saveEmployee(){
         if(!empty($this->input->post())){
@@ -361,15 +186,15 @@ class Admin extends MY_Controller {
                     $response = $this->AdminModel->saveEmployee($address,$table);
 
                     if($response){
-                        print_r(json_encode(array( 'msg' => 'success')));
+                        var_dump(json_encode(array( 'msg' => 'success')));
                     }
 
                 }else{
-                    print_r(json_encode($response));
+                    var_dump(json_encode($response));
                 }
 
             }else{
-                print_r(json_encode($response));
+                var_dump(json_encode($response));
             }
             
         }

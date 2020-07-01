@@ -543,8 +543,7 @@ class Cashier extends MY_Controller {
 
         // $sd = '2020-08-20'; 
         $d1 = date('Y-m-d', strtotime($date. ' + 1 days'));     
-        
-        $due_date = $this->CashierModel->getDueDate('billing due days');
+        $due_date = $this->CashierModel->getDueDate('Billing Due');
         $holiday = $this->CashierModel->getHoliday(date('m', strtotime($date)));
         
         $i=1;
@@ -563,6 +562,7 @@ class Cashier extends MY_Controller {
                 $d1 = date('Y-m-d', strtotime($d1. ' + 1 days'));
                 
             }
+
             else{
 
                 if(!empty($holiday)){

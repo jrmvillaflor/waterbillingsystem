@@ -45,31 +45,31 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 col-form-label">
-                                First Name: <Strong><?php echo ($profile==NULL?'':$profile[0]->firstname)?></Strong> 
+                                First Name: <Strong><?php echo $profile[0]->firstname?></Strong> 
                             </div>
                             <div class="col-md-6 col-form-label">
-                                Last Name: <Strong><?php echo ($profile==NULL?'':$profile[0]->lastname)?></Strong>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 col-form-label">
-                                Gender: <Strong><?php echo ($profile==NULL?'':$profile[0]->gender)?></Strong> 
-                            </div>
-                            <div class="col-md-6 col-form-label">
-                                Contact Number: <Strong><?php echo ($profile==NULL?'':$profile[0]->contactNo)?></Strong>
+                                Last Name: <Strong><?php echo $profile[0]->lastname?></Strong>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 col-form-label">
-                                Street: <Strong><?php echo ($profile==NULL?'':$profile[0]->emp_street)?></Strong>
+                                Gender: <Strong><?php echo $profile[0]->gender?></Strong> 
                             </div>
                             <div class="col-md-6 col-form-label">
-                                Barangay: <Strong><?php echo ($profile==NULL?'':$profile[0]->emp_barangay)?></Strong>
+                                Contact Number: <Strong><?php echo $profile[0]->contactNo?></Strong>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 col-form-label">
-                                City/Province: <Strong><?php echo ($profile==NULL?'':$profile[0]->emp_city)?></Strong>
+                                Street: <Strong><?php echo $profile[0]->street?></Strong>
+                            </div>
+                            <div class="col-md-6 col-form-label">
+                                Barangay: <Strong><?php echo $profile[0]->barangay?></Strong>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-form-label">
+                                City/Province: <Strong><?php echo $profile[0]->city?></Strong>
                             </div>
                             
                         </div>
@@ -80,11 +80,16 @@
     </div>
 </div>
 
+<button class="btn btn-success" id="modal">Edit</button>
+
+
+
+
 <div class="modal fade" id="editProfile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <strong>Edit Profile</strong>
+                Edit Profile
             </div>
             <div class="modal-body" >
                 <div class="row">
@@ -118,15 +123,15 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="">Street</label>
-                        <input type="text" class="form-control" placeholder="Street" id="street">
+                        <input type="text" class="form-control" placeholder="Enter your First Name" id="street">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="">Barangay</label>
-                        <input type="text" class="form-control" placeholder="Barangay" id="barangay">
+                        <input type="text" class="form-control" placeholder="Enter your First Name" id="barangay">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="">City/Province</label>
-                        <input type="text" class="form-control" placeholder="City" id="city">
+                        <input type="text" class="form-control" placeholder="Enter your Last Name" id="city">
                     </div>
                 </div>
             </div>
@@ -155,7 +160,7 @@
         var barangay = $(btn).attr("barangay");
         var city = $(btn).attr("city");
 
-        $("#editProfile").modal();
+        alert(fname+' '+ lname);
     }
 
 </script>

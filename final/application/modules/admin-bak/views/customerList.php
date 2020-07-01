@@ -153,7 +153,6 @@
                 var data = $.parseJSON(datas);
                 
                 alert(data.msg);
-                location.reload();
                 
             },
             error: function(){

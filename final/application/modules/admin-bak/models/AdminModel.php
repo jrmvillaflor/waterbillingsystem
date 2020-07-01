@@ -43,7 +43,7 @@ class AdminModel extends CI_Model {
     
         }
         else{
-            return $response = array( 'msg' => 'Server Error' );
+            return $response = array( 'msg' => 'Operation failed' );
             
 
         }
@@ -53,6 +53,7 @@ class AdminModel extends CI_Model {
     public function getData($tbl){
 
         $query = $this->db->get($tbl);
+
         return $query->result();
 
     }
@@ -101,15 +102,13 @@ class AdminModel extends CI_Model {
     
         }
         else{
-            return $response = array( 'msg' => 'Server Error' );
+            return $response = array( 'msg' => 'Operation failed' );
             
 
         }
 
 
     }
-
-
 
 
     public function idChecker($tbl, $pk, $id){
@@ -132,81 +131,15 @@ class AdminModel extends CI_Model {
 
         if ($this->db->update('account', $acc )) {
             return $response = array( 'msg' => 'success' );
-        }
-        else{
-            return $response = array( 'msg' => 'Server Error' );
-        }
-    }
-
-
-    function doInsert($tbl, $holi){
-
-        if ($this->db->insert($tbl, $holi)) {
-            return TRUE;
-        }
-        else{
-            return $response = array( 'msg' => 'Server Error' );
-        }
-
-    }
-
-    function getHoliday(){
-        
-        $this->db->order_by("holiday_date","ASC");
-
-        $query = $this->db->get("holiday");
-        return $query->result();
-
-    }
-
-
-    
-    function getCubicRates($type){
-
-        $this->db->select("*");
-        $this->db->from("cubic_range");
-        $this->db->join("account_type_fees", "cubic_range.cubic_range_id = account_type_fees.cubic_range_id");
-        $this->db->join("account_type", "account_type_fees.account_type_code = account_type.account_type_code");
-
-        $this->db->where("account_type_desc", $type);
-
-        $query = $this->db->get();
-        return $query->result();
-
-    }
-    
-
-
-    function doUpdate($tbl,$data,$pk){
-
-        $this->db->where($pk, $data[$pk]);
-
-        if ($this->db->update($tbl, $data )) {
-            return $response = array( 'msg' => 'success' );
+            
     
         }
         else{
-            return $response = array( 'msg' => 'Server Error' );
+            return $response = array( 'code' => 'Operation failed' );
+            
 
         }
     }
-
-
-    function doDelete($id){
-
-        $this->db->where('holiday_id', $id);
-        $res = $this->db->delete('holiday');
-        if ($res) {
-            return $response = array( 'msg' => 'success' );
-    
-        }
-        else{
-            return $response = array( 'msg' => 'Server Error' );
-
-        }
-    }
-
-
 
 
 
