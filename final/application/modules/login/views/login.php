@@ -10,7 +10,7 @@
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
                   <span class="input-group-text">
-                    <i class="icon-user"></i>
+                    <i class="cil-user"></i>
                   </span>
                 </div>
                 <input type="text" class="form-control" placeholder="Username" name="username">
@@ -18,7 +18,7 @@
               <div class="input-group mb-4">
                 <div class="input-group-prepend">
                   <span class="input-group-text">
-                    <i class="icon-lock"></i>
+                    <i class="cil-lock-locked"></i>
                   </span>
                 </div>
                 <input type="password" class="form-control" placeholder="Password" name="password">
