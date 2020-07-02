@@ -167,7 +167,7 @@ class AdminModel extends CI_Model {
         $this->db->from("cubic_range");
         $this->db->join("account_type_fees", "cubic_range.cubic_range_id = account_type_fees.cubic_range_id");
         $this->db->join("account_type", "account_type_fees.account_type_code = account_type.account_type_code");
-
+        $this->db->order_by("cubic_range_from", "asc");
         $this->db->where("account_type_desc", $type);
 
         $query = $this->db->get();
@@ -192,10 +192,10 @@ class AdminModel extends CI_Model {
     }
 
 
-    function doDelete($id){
+    function doDelete($id,$pk, $tbl){
 
-        $this->db->where('holiday_id', $id);
-        $res = $this->db->delete('holiday');
+        $this->db->where($pk, $id);
+        $res = $this->db->delete($tbl);
         if ($res) {
             return $response = array( 'msg' => 'success' );
     

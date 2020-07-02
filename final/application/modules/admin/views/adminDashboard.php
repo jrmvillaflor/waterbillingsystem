@@ -94,6 +94,7 @@
                         </span>
                     </div>
                 </div>
+
                 <div class="modal-body" >
                     <table class="table table-stripe table-bordered" id="table">
                         <thead class="thead-dark">
@@ -149,6 +150,7 @@
                         <li class="list-group-item">Porta ac consectetur ac</li>
                         <li class="list-group-item">Vestibulum at eros</li>
                     </ul>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" id="btnClose">Close</button>
@@ -243,6 +245,10 @@
 
     $("#tu").on("click", function(){
         $("#modalList").modal()
+
+
+
+
          $.ajax({
                 type:"GET",
                 url:'<?php echo base_url('admin/getAllUserActive');?>',
@@ -295,6 +301,7 @@
                     alert("Operation Failed");
                 }
             });
+
     })
 
     $(document).ready(function(){

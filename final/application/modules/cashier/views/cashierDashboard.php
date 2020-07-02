@@ -23,7 +23,7 @@
                         <th scope="col" width=300>Action</th>  
                     </tr>
                 </thead>
-                <tbody class="tbody-light">
+                <tbody class="tbody-light" id="customerList">
                     <?php if($customers != null ):?>
                         <?php foreach($customers as $customer):?>
                             <tr id="trbody">
@@ -38,17 +38,25 @@
                                 </td>
                             </tr>
                         <?php endforeach;?>
+
+                    <?php else:?>
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <div class=" mx-auto" data-text=""><img src="<?php echo base_url('assets/images/undraw_no_data_qbuo.svg');?>" width="100"></div>
+                                <p class="lead text-gray-800 mb-5">No Found Data</p>
+                                <p class="text-gray-500 mb-0">It looks no data has been recorded.</p>
+                            </td>
+                        </tr>
+
                     <?php endif?>
                 </tbody>
             </table>
         </div>
-        <?php if($customers == null):?>
+        <!-- <?php if($customers == null):?>
             <div class="text-center">
-                <div class=" mx-auto" data-text=""><img src="<?php echo base_url('assets/images/undraw_no_data_qbuo.svg');?>" width="100"></div>
-                <p class="lead text-gray-800 mb-5">No Found Data</p>
-                <p class="text-gray-500 mb-0">It looks no data has been recorded.</p>
+                
             </div>
-        <?php endif;?>
+        <?php endif;?> -->
 
     </div>
 </div>
