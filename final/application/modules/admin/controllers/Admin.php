@@ -403,14 +403,16 @@ class Admin extends MY_Controller {
     }
 
 
+    //Zed ~~~
 
     public function countUser(){
 
 
-        $user = $this->AdminModel->getData('customer_account');
+        $user = $this->AdminModel->getAllCustomer("Active"); 
 
         print_r(json_encode(count($user)));
     }
+
 
     public function getReconnection(){
 
@@ -432,5 +434,100 @@ class Admin extends MY_Controller {
 
         print_r(json_encode(count($disconn)));
     }
+
+    public function getAllUserActive(){
+        $data['user'] = $this->AdminModel->getAllCustomer("Active"); 
+        print_r($this->load->view("widget_table", $data));
     
+    }
+    public function getAllUserForReconnection(){
+        $data['user'] = $this->AdminModel->getAllCustomer("For Reconnection"); 
+        print_r($this->load->view("widget_table", $data)); 
+    }
+    public function getAllUserForDisconnection(){
+        $data['user'] = $this->AdminModel->getAllCustomer("For Disconnection");  
+        print_r($this->load->view("widget_table_special", $data)); 
+    }
+    public function getAllUserDisconnection(){
+        $data['user'] = $this->AdminModel->getAllCustomer("Disconnected"); 
+        print_r($this->load->view("widget_table", $data)); 
+    }
+
+
+    public function checkUserActive(){
+
+        $allCustomers = $this->AdminModel->getAllCustomer('Active');
+        foreach ($allCustomers as $v) {
+            $data['records'] = $this->AdminModel->getRecords($v->customer_account_id);
+            $data['payments'] = $this->AdminModel->payments($v->customer_account_id); 
+   
+        $month = 0;
+        $cp = count($data['payments'])-1;
+        foreach($data['records'] as $rec){
+            foreach($data['payments'] as $p => $payment){
+                if($rec->date_of_reading == $payment->date_of_reading){
+
+                    $month = 0;
+                    break;
+                }
+                else{
+                    if($cp == $p){
+                        $month++;
+                    }
+                }
+            } 
+            $date = $rec->date_of_reading;
+        }   
+        
+    
+        
+                                                     //Date now
+            if(date('Y-m-d', strtotime($date. ' + 3 days')) > date("Y-m-d"))
+            {
+            $this->AdminModel->addStatus($v->customer_account_id,4);
+          
+            }
+
+        }
+    }
+
+
+    public function disconnectCustomer($id){
+        $this->AdminModel->addStatus($id,3);
+
+                        ?>
+                        <script type="text/javascript">
+                            alert('success');
+                            document.location = '<?php echo base_url('admin/adminDashboard');?>';
+
+                        </script>
+                        <?php
+    } 
+
+    public function earnings() {
+
+        $earnings = array();
+
+        $month = 0;
+        while($month!=12) {
+            $month++;
+            $earning=$this->AdminModel->getPaymentSum($month);
+            foreach ($earning as $key) {
+               if ($key->amount==null) {
+                array_push($earnings,0);
+               
+            } else {
+                array_push($earnings,$key->amount); 
+            }
+            }
+            
+            
+        }
+
+        print_r(json_encode($earnings));
+     
+      
+    }
+
+
 }

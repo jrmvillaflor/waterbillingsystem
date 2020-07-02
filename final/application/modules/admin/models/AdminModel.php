@@ -207,11 +207,76 @@ class AdminModel extends CI_Model {
     }
 
 
+//Zed
+
+
+    public function getRecords($id){
+
+        $this->db->select('*');
+        $this->db->from('customer_account');
+        $this->db->join('meter_reading', 'customer_account.customer_account_id = meter_reading.customer_account_id');
+        $this->db->join('account_type', 'customer_account.account_type_code = account_type.account_type_code');
+        $this->db->where('customer_account.customer_account_id', $id);
+        
+
+        $query = $this->db->get();
+        return $query->result();
+
+    }
+
+
+     public function allPayments(){
+
+        $this->db->select_sum('amount');
+        $this->db->select('payment_date');
+        $this->db->from('customer_payment');
+        
+        $this->db->group_by('MONTH(payment_date)');
+
+    
+        $query = $this->db->get();
+        return $query->result();
+
+    }
+
+    public function getPaymentSum($month){
+        $this->db->select_sum('amount');
+  
+        $this->db->from('customer_payment');
+        $this->db->where('YEAR(payment_date)','2020');
+        $this->db->where('MONTH(payment_date)',$month);
+         $query = $this->db->get();
+        return $query->result();
+    }
+
+    public function payments($id){
+
+        $this->db->select('*');
+        $this->db->from('customer_payment');
+        $this->db->join('customer_bill_record', 'customer_payment.OR_number = customer_bill_record.OR_number');
+        $this->db->join('meter_reading', 'meter_reading.meter_reading_id = customer_bill_record.meter_reading_id');
+        $this->db->where('customer_payment.customer_account_id',$id);
+    
+        $query = $this->db->get();
+        return $query->result();
+
+    }
+
+
+    public function addStatus($id, $status_id){
+        date_default_timezone_set("Asia/Manila");
+        $dateToday = date("Y-m-d H:i:s");
+        $data = [
+        'account_status_date' => $dateToday,
+        'account_status_type_id'  => $status_id,
+        'customer_account_id'  => $id
+        ];
+        $this->db->insert('account_status', $data);
+    }
 
 
 
-
-
+//~~~
 
 
 
