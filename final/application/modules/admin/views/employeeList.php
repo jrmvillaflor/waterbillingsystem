@@ -28,6 +28,7 @@
                         <tr style="cursor:pointer" onclick="document.location='<?php echo base_url('admin/employeeDetails/').$emp->accId?>'">
                             <td><?php echo $emp->accId?></td>
                             <td><?php echo $emp->email?></td>
+                            <td><?php echo $emp->password?></td>
                             <td><?php echo $emp->user_type_desc?></td>
                             <td>Active</td>
                             <td>
