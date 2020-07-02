@@ -205,7 +205,10 @@ class Admin extends MY_Controller {
 
     function deleteDue(){
 
-        $response = $this->AdminModel->doDelete($this->input->post("due_id"));
+        $pk="due_id";
+        $tbl="due_dates";
+
+        $response = $this->AdminModel->doDelete($this->input->post("due_id"),$pk, $tbl);
 
         print_r(json_encode($response));
 
@@ -239,7 +242,10 @@ class Admin extends MY_Controller {
 
     function deleteHoliday(){
 
-        $response = $this->AdminModel->doDelete($this->input->post("holiday_id"));
+        $pk="holiday_id";
+        $tbl="holiday";
+
+        $response = $this->AdminModel->doDelete($this->input->post("holiday_id"),$pk, $tbl);
 
         print_r(json_encode($response));
 
@@ -410,6 +416,12 @@ class Admin extends MY_Controller {
         $user = $this->AdminModel->getData('customer_account');
 
         print_r(json_encode(count($user)));
+    }
+
+    function viewUser(){
+
+        $data['user'] = $this->AdminModel->getData('customer_account'); 
+        print_r($this->load->view("list", $data));
     }
 
     public function getReconnection(){

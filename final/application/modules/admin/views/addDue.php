@@ -227,6 +227,8 @@
         data = {
             due_id: dueID
         }
+
+        console.log(data);
         
         $.ajax({
             type:"POST",

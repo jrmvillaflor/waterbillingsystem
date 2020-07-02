@@ -16,7 +16,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="<?php echo base_url('admin/addHoliday');?>">
-                    <i class="nav-icon icon-drop"></i>Others</a>
+                    <i class="nav-icon icon-drop"></i> Others</a>
             </li>
             <li class="nav-title ">EMPLOYEE</li>
             <li class="nav-item">
@@ -25,7 +25,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="<?php echo base_url('admin/employeelist');?>">
-                    <i class="nav-icon icon-drop"></i>List Of Employee</a>
+                    <i class="nav-icon icon-drop"></i>List of Employee</a>
             </li>
 
 

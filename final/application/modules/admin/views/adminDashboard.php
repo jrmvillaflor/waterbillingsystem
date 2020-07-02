@@ -94,24 +94,8 @@
                         </span>
                     </div>
                 </div>
-                <div class="modal-body" >
-                    <ul class="list-group">
-                        <li class="list-group-item">Cras justo odio</li>
-                        <li class="list-group-item">Dapibus ac facilisis in</li>
-                        <li class="list-group-item">Morbi leo risus</li>
-                        <li class="list-group-item">Porta ac consectetur ac</li>
-                        <li class="list-group-item">Vestibulum at eros</li>
-                        <li class="list-group-item">Cras justo odio</li>
-                        <li class="list-group-item">Dapibus ac facilisis in</li>
-                        <li class="list-group-item">Morbi leo risus</li>
-                        <li class="list-group-item">Porta ac consectetur ac</li>
-                        <li class="list-group-item">Vestibulum at eros</li>
-                        <li class="list-group-item">Cras justo odio</li>
-                        <li class="list-group-item">Dapibus ac facilisis in</li>
-                        <li class="list-group-item">Morbi leo risus</li>
-                        <li class="list-group-item">Porta ac consectetur ac</li>
-                        <li class="list-group-item">Vestibulum at eros</li>
-                    </ul>
+                <div class="modal-body" id="modalBody">
+                    
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" id="btnClose">Close</button>
@@ -131,6 +115,22 @@
 
     $("#tu").on("click", function(){
         $("#modalList").modal()
+
+        $.ajax({
+            type:"GET",
+            url:'<?php echo base_url('admin/viewUser');?>',
+            success: function(response){
+
+                // var data = $.parseJSON(response);
+
+                console.log(response);
+                // console.log(data);
+                $("div#modalBody").html(response);
+            },
+            error: function(){
+                alert("Operation Failed");
+            }
+        });
     })
 
     $(document).ready(function(){
