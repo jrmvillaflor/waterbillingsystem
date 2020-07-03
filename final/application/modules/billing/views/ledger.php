@@ -11,9 +11,9 @@
                             <?php endforeach;?>
                         </select>
                     </div>
-                    <div class="col-md-1">
+                    <!-- <div class="col-md-1">
                         <button class="btn btn-primary">Meter</button>
-                    </div>
+                    </div> -->
                 </div> 
             </div>
             <div class="col-md-6">

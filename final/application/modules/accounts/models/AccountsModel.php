@@ -11,7 +11,7 @@ class AccountsModel extends CI_Model {
         $this->db->from('review_customer');
         $this->db->join('barangay', 'review_customer.brgy_id = barangay.brgy_id');
         $this->db->join('review_status','review_customer.review_status_id = review_status.review_status_id');
-        $this->db->where('review_status_desc', 'Pending');
+        $this->db->where('review_status.review_status_id', 1);
         $query = $this->db->get();
         return $query->result();
 

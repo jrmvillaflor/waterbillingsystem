@@ -19,16 +19,6 @@
                 </thead>
                 <tbody id="tableaccounts">
                     <tr>
-                        <td colspan="4" class="label-bill">NAME AND ADDRESS</td>
-                    </tr>
-                    <tr>
-                        <td colspan="4" class="label-bill">ACCOUNT NUMBER 
-                        <span class="text-gray pl-2">
-                            <!-- <strong><?php echo $infos[0]->customer_account_id ?></strong> -->
-                        </span>
-                        </td>
-                    </tr>
-                    <tr>
                         <td colspan="2"class="label-bill text-center">READINGS</td>
                         <td class="label-bill">Cubic Meter</td>
                         <td rowspan="2" class="label-bill text-center">AMOUNT

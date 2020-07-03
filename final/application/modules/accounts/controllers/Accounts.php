@@ -33,6 +33,7 @@ class Accounts extends MY_Controller {
         $data['main_content'] = 'newCustomer';
         echo Modules::run('template/main_content', $data);
 
+        // var_dump($data['customers'] );
 
     } 
 

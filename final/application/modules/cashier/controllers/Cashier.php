@@ -264,7 +264,7 @@ class Cashier extends MY_Controller {
                     
                     if($check_date == $for_disconn){
 
-                        // $data['accountStatus'] = 'For Disconnection';
+                        $data['accountStatus'] = 'For Disconnection';
 
                         $receipt = $this->CashierModel->getReciept($custAccId);
 
@@ -313,8 +313,43 @@ class Cashier extends MY_Controller {
 
                     $data["bill"] = $data['fees'][0]->application_fee + $data['fees'][0]->advance_payments + $data['fees'][0]->connection_fee;
 
+                    
+                    
                 }
                 
+                if($result[0]->account_status_desc == 'Disconnected'){
+
+                    // $data['records'] = $this->CashierModel->getRecords($custAccId);
+                    // $data['payments'] = $this->CashierModel->payments($custAccId); 
+                    // $data['OP'] = $this->CashierModel->getPenalty('penalty');
+
+
+                    // // var_dump($data['payments']);
+                    // // var_dump($data['records']);
+                    // $arrears=0;
+                    // foreach($data['records'] as $r => $record){
+                    //     if($r != 0){
+                    //         $con =  $record->reading_value - $prev;
+                    //         echo $con;
+                    //         echo "<br>";
+                    //         $b = $this->calculateBill($data['records'][0]->account_type_code, $con);
+                    //         $b += $b*.02;
+                    //         $arrears += $b;
+                    //         echo $arrears;
+                    //         echo "<br>";
+                    //     }
+                        
+                    //     $prev = $record->reading_value;
+
+                        
+
+
+                    // }
+
+                }
+            
+
+                // var_dump($data['arrears']);
               
                 
 

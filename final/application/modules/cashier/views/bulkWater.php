@@ -16,7 +16,7 @@
                     <tr>
                         <th>Name</th>
                         <th>Cubic Meter</th>
-                        <th width='150'>Edit</th>
+                        <!-- <th width='150'>Edit</th> -->
                     </tr>
                 </thead>
                 <tbody class="tbody-light" id="bulkBody">
