@@ -423,104 +423,110 @@ class Billing extends MY_Controller {
     }
 
 
-    public function customerBill(){
 
-        if($this->uri->segment(3)):
-            $this->load->library('pdf');
+        public function customerBill($id){
 
-            $customer_Id = $this->uri->segment(3);
-
-            $data['readings'] = $this->BillingModel->monthlyReading('20200067462020-LGO');
-            $data['fees'] = $this->BillingModel->toPay('20200067462020-LGO',"Active");
-            
-
-            // getting Arrears 
-            $data['records'] = $this->BillingModel->getRecords('20200067462020-LGO');
-            $data['payments'] = $this->BillingModel->payments('20200067462020-LGO'); 
-            $data['OP'] = $this->BillingModel->getPenalty('penalty');
-
-            foreach($data['records'] as $r => $record){
-                $cr = count($data['records'])-1;
+            if($this->uri->segment(3)):
+                $this->load->library('pdf');
+    
+                $customer_Id = $this->uri->segment(3);
+                $data['userInfo'] = $this->BillingModel->customerInfo($id);
+                $data['readings'] = $this->BillingModel->monthlyReading($data['userInfo'][0]->customer_account_id);
+    
+                $data['fees'] = $this->BillingModel->toPay($data['userInfo'][0]->customer_account_id,"Active");
+    
+                // getting Arrears 
+                $data['records'] = $this->BillingModel->getRecords($data['userInfo'][0]->customer_account_id);
+                $data['payments'] = $this->BillingModel->payments($data['userInfo'][0]->customer_account_id); 
+                $data['OP'] = $this->BillingModel->getPenalty('penalty');
+    
+    
                 
-                $total =0;
-    
-                if($r == 0){
-                    $prev = $record->reading_value;
-                    $balance = 0;
-                }else{
-                    if ($balance == 0) {
-                        $overdue = 0;
-                    }else{
-                        $overdue = round($balance,2);
-                    }
-                    if($overdue == 0){
-                        $penalty = 0;
-                    }else{
-                        $penalty = round($overdue * $data['OP'][0]->op_value,2);
-                    }
-    
-                    foreach ($data['payments'] as $p => $payment) {
-    
-                        $cp = count($data['payments'])-1;
+                    foreach($data['records'] as $r => $record){
+                        $cr = count($data['records'])-1;
                         
-                        $con = $record->reading_value-$prev;
-                        $b = $this->calculateBill($data['records'][0]->account_type_code, $con);
+                        $total =0;
+            
+                        if($r == 0){
+                            $prev = $record->reading_value;
+                            $balance = 0;
+                        }else{
+                            if ($balance == 0) {
+                                $overdue = 0;
+                            }else{
+                                $overdue = round($balance,2);
+                            }
+                            if($overdue == 0){
+                                $penalty = 0;
+                            }else{
+                                $penalty = round($overdue * $data['OP'][0]->op_value,2);
+                            }
+            
+                            foreach ($data['payments'] as $p => $payment) {
+            
+                                $cp = count($data['payments'])-1;
+                                
+                                $con = $record->reading_value-$prev;
+                                $b = $this->calculateBill($data['records'][0]->account_type_code, $con);
+            
+                                $total = round($overdue+$b+$penalty,2);
+                                
+                                if($record->date_of_reading == $payment->date_of_reading ){
+                                    $amount = $payment->amount;
+                                    break;
+                                }
+                                else{
+                                    if ($cp == $p) {
+                                        $amount = 0;
+                                    }    
+                                }                           
+                            }
+            
+                            $balance = round($total - $amount,2);
+                            
+                            if($cr != $r){
+                                $arrears = $balance + round($balance * $data['OP'][0]->op_value,2);
+                                $data['arrears'] = $arrears;
+                            }
+                            
+                            $data['date'] = $record->date_of_reading;
+                            $prev = $record->reading_value;
+                        }
+                    }
     
-                        $total = round($overdue+$b+$penalty,2);
-                        
-                        if($record->date_of_reading == $payment->date_of_reading ){
-                            $amount = $payment->amount;
-                            break;
+                    foreach ($data['readings'] as $key => $value) {
+                        if($key == 0){
+                            $pres = $value->reading_value;
                         }
                         else{
-                            if ($cp == $p) {
-                                $amount = 0;
-                            }    
-                        }                           
+                            $prev = $value->reading_value;
+                            
+                        }
+    
+                        
                     }
     
-                    $balance = round($total - $amount,2);
+                    $consumed = $pres - $prev;
+    
+    
+    
                     
-                    if($cr != $r){
-                        $arrears = $balance + round($balance * $data['OP'][0]->op_value,2);
-                        $data['arrears'] = $arrears;
-                    }
-                    
-                    $data['date'] = $record->date_of_reading;
-                    $prev = $record->reading_value;
-                }
-            }
-
-            foreach ($data['readings'] as $key => $value) {
-                if($key == 0){
-                    $pres = $value->reading_value;
-                }
-                else{
-                    $prev = $value->reading_value;
-                    
-                }
-
-                
-            }
-
-            $consumed = $pres - $prev;
-
-
-
-            
-            $data['bill'] = $this->calculateBill($data['fees'][0]->account_type_code, $consumed);
-            $data['due_date'] = $this->workingDays($data['date']);
-
-            $this->load->view('billing/customerBill',$data);
-
-            $html = $this->output->get_output();
-
-            $this->pdf->loadHTML($html);
-            $this->pdf->render();
-            $this->pdf->stream("Bill.pdf",array("Attachment"=>0));
-
-        endif;
-    }
+                    $data['bill'] = $this->calculateBill($data['fees'][0]->account_type_code, $consumed);
+                    $data['due_date'] = $this->workingDays($data['date']);
+    
+                    $this->load->view('billing/customerBill',$data);
+    
+                    $html = $this->output->get_output();
+    
+                    $this->pdf->loadHTML($html);
+                    $this->pdf->render();
+                    $this->pdf->stream("Bill.pdf",array("Attachment"=>0));
+    
+            endif;
+        }
+    
+    
+    
 
 
     public function workingDays($date){
