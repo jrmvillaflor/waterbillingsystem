@@ -266,6 +266,21 @@ class CashierModel extends CI_Model {
 
     }
 
+    function doUpdate($tbl,$data,$pk){
+
+        $this->db->where($pk, $data[$pk]);
+
+        if ($this->db->update($tbl, $data )) {
+            return $response = array( 'msg' => 'Successful' );
+    
+        }
+        else{
+            return $response = array( 'msg' => 'Server Error' );
+
+        }
+    }
+
+
 
 
 }

@@ -54,7 +54,7 @@
                                     <td><?php echo $payment->amount?></td>
                                     <td><?php echo $payment->payment_date?></td>
                                     <td>
-                                        <a href="#" class="btn btn-success">Update</a>
+                                        <button class="btn btn-success" OR="<?php echo $payment->OR_number?>" p-type="<?php echo $payment->payment_type_desc?>" p-amount="<?php echo $payment->amount?>" p-date="<?php echo $payment->payment_date?>" onclick="showModal(this)">Edit</button>
                                     </td>
                                 </tr>
                             <?php endforeach;?>
@@ -74,3 +74,102 @@
         </div>
     </div>
 </div>
+
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            
+            </div>
+            <div class="modal-body" >
+                <div class="row">
+                    <div class="col-md-12">
+                        <input type="hidden" id="due_id">
+                        <div class="form-group">
+                            <label for="">OR Number</label>
+                            <input type="text" name="" class="form-control" id="or-num">
+                        </div>  
+                
+                    </div>
+                    <!-- <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="">Type of Payment</label>
+                            <input type="text" name="" class="form-control" id="p-type">
+                        </div>  
+                
+                    </div> -->
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="">Amount</label>
+                            <input type="text" name="" class="form-control" id="p-amount">
+                        </div>  
+                
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="">Date</label>
+                            <input type="text" name="" class="form-control" id="pdate">
+                        </div>  
+                
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="btnClose">Close</button>
+                <button type="button" class="btn btn-primary" id="saveEdit">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    $( function() {
+        $( "#pdate" ).datepicker({ dateFormat: 'yy-mm-dd' });
+    });
+
+    function showModal(btn){
+        $("#editModal").modal();
+        $("#or-num").val( $(btn).attr("OR"));
+        $("#p-type").val( $(btn).attr("p-type"));
+        $("#p-amount").val( $(btn).attr("p-amount"));
+        $("#pdate").val( $(btn).attr("p-date"));
+  
+    }
+
+
+    $("#saveEdit").on("click", function(){
+        var or_num = $("#or-num").val();
+        var p_type = $("#p-type").val();
+        var p_amount = $("#p-amount").val();
+        var p_date = $("#pdate").val();
+
+        data = {
+            or_num: or_num,
+            p_amount: p_amount,
+            p_date: p_date,
+
+        }
+
+        $.ajax({
+            type:"POST",
+            data:data,
+            url:'<?php echo base_url('cashier/updateOr');?>',
+            success: function(datas){
+                var data = $.parseJSON(datas);
+                
+                alert(data.msg);
+                location.reload();
+                
+            },
+            error: function(data){
+                alert(data.responseText);
+                // console.log(data);
+                // alert("Operation Failed");
+            }
+        });
+
+    })
+</script>

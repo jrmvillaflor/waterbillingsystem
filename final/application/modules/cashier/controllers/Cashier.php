@@ -691,6 +691,22 @@ class Cashier extends MY_Controller {
         }
     }
 
+    function updateOr(){
+
+        $payment = array(
+            'OR_number' => $this->input->post('or_num'),
+            'amount' => $this->input->post('p_amount'),
+            'payment_date' => $this->input->post('p_date'),
+        );
+        $tbl = "customer_payment";
+        $pk = "OR_number";
+
+        $response = $this->CashierModel->doUpdate($tbl,$payment,$pk);
+
+
+        print_r(json_encode($response));
+    }
+
 
 
     
