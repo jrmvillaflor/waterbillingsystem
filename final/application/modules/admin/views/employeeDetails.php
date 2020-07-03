@@ -166,42 +166,45 @@
         var barangay = $("#barangay").val();
         var city = $("#city").val();
 
-
-        data ={
-            empID: empID,
-            fname: fname,
-            lname: lname,
-            gender: gender,
-            street: street,
-            barangay: barangay,
-            city: city,
-            accID: accID,
-        }
-
-        console.log(data);
-        $("#editProfile").modal("hide");
- 
-
-        // console.log(data);
-
-        $.ajax({
-            type:"POST",
-            data:data,
-            url:"<?php echo base_url('admin/updateProfile');?>",
-            success: function(datas){
-                var data = $.parseJSON(datas);
-                
-                alert(data.msg);
-                location.reload();
-                
-            },
-            error: function(data){
-                alert(data.responseText);
-                // console.log(data);
-                // alert("Operation Failed");
+        if(fname == "" && lname == "" && contact == "" && gender == "" && street == "" && barangay == "" && city == ""){
+            data ={
+                empID: empID,
+                fname: fname,
+                lname: lname,
+                gender: gender,
+                street: street,
+                contact: contact,
+                barangay: barangay,
+                city: city,
+                accID: accID,
             }
-        });
-        
+
+            console.log(data);
+            $("#editProfile").modal("hide");
+    
+
+            // console.log(data);
+
+            $.ajax({
+                type:"POST",
+                data:data,
+                url:"<?php echo base_url('admin/updateProfile');?>",
+                success: function(datas){
+                    var data = $.parseJSON(datas);
+                    
+                    alert(data.msg);
+                    location.reload();
+                    
+                },
+                error: function(data){
+                    alert(data.responseText);
+                    // console.log(data);
+                    // alert("Operation Failed");
+                }
+            });
+        }else{
+            alert("Empty Fields");
+        }
     })
 
 </script>
