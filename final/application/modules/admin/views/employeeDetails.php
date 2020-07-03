@@ -91,17 +91,17 @@
                     <input type="hidden" id="empID" value="">
                     <div class="form-group col-md-6">
                         <label for="">First Name</label>
-                        <input type="text" class="form-control" id="fname" placeholder="Enter your First Name" name="fname">
+                        <input type="text" class="form-control" id="fname" placeholder="Enter your First Name" fname="fname">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="">Last Name</label>
-                        <input type="text" class="form-control" id="lname" placeholder="Enter your Last Name" name="lname">
+                        <input type="text" class="form-control" id="lname" placeholder="Enter your Last Name" lname="lname">
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label for="">Gender</label>
-                        <select name="gender" id="gender" class="form-control">
+                        <select id="gender" class="form-control">
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                         </select>
@@ -132,7 +132,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" id="btnClose">Close</button>
-                <button type="button" class="btn btn-primary" id="save">Save changes</button>
+                <button type="button" class="btn btn-primary" id="saveProfile">Save changes</button>
             </div>
         </div>
     </div>
@@ -141,6 +141,8 @@
 
 <script> 
 
+    let accID;
+    let empID;
     $("#modal").on("click", function(){
         $("#editProfile").modal()
     })
@@ -148,14 +150,58 @@
 
 
     function editProf(btn){
-        var fname = $(btn).attr("fname");
-        var lname = $(btn).attr("lname");
-        var gender = $(btn).attr("gender");
-        var street = $(btn).attr("street");
-        var barangay = $(btn).attr("barangay");
-        var city = $(btn).attr("city");
 
+        accID = $(btn).attr("acc-id");
+        empID = $(btn).attr("acc-id")+"-emp";
         $("#editProfile").modal();
+        console.log(accID);
     }
+
+    $("#saveProfile").on("click", function(){
+        var fname = $("#fname").val();
+        var lname = $("#lname").val();
+        var contact = $("#contact").val();
+        var gender = $("#gender").val();
+        var street = $("#street").val();
+        var barangay = $("#barangay").val();
+        var city = $("#city").val();
+
+
+        data ={
+            empID: empID,
+            fname: fname,
+            lname: lname,
+            gender: gender,
+            street: street,
+            barangay: barangay,
+            city: city,
+            accID: accID,
+        }
+
+        console.log(data);
+        $("#editProfile").modal("hide");
+ 
+
+        // console.log(data);
+
+        $.ajax({
+            type:"POST",
+            data:data,
+            url:"<?php echo base_url('admin/updateProfile');?>",
+            success: function(datas){
+                var data = $.parseJSON(datas);
+                
+                alert(data.msg);
+                location.reload();
+                
+            },
+            error: function(data){
+                alert(data.responseText);
+                // console.log(data);
+                // alert("Operation Failed");
+            }
+        });
+        
+    })
 
 </script>

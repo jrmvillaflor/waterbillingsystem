@@ -310,13 +310,11 @@
         // $("div#forReconn").text('20');
         // $("div#forDis").text('20');
         // $("div#disconn").text('20');
-
-        getTotalUser();
-
-                checkUserActive();
-                getReconnUser();
-                getFordisconn();
-                disconnected();
+        checkUserActive();
+        getTotalUser();    
+        getReconnUser();
+        getFordisconn();
+        disconnected();
 
 
         function getTotalUser(){
@@ -342,9 +340,11 @@
             $.ajax({
                 type:"GET",
                 url:'<?php echo base_url('admin/checkUserActive');?>',
-                success: function(response){
+                success: function(response){    
+                    if(response != 0){
+                        alert(response + " number of Customer change to For Disconnection Status");
 
-                    
+                    }
 
                 },
                 error: function(){
@@ -447,12 +447,12 @@
 
 
      $.ajax({
-                type:"GET",
-                url:'<?php echo base_url('admin/earnings');?>',
-                success: function(response){
-                    alert(response);
-                    var response = JSON.parse(response);
-                    var chart = new Chart(myChart, {
+        type:"GET",
+        url:'<?php echo base_url('admin/earnings');?>',
+        success: function(response){
+            // alert(response);
+            var response = JSON.parse(response);
+            var chart = new Chart(myChart, {
         type: 'bar',
         data:{
             labels:utils.months(),
@@ -460,18 +460,18 @@
                 label: 'Earnings',
                 data:[
                     response[0],
-                      response[1],
-                        response[2],
-                          response[3],
-                            response[4],
-                              response[5],
-                                response[6],
-                                  response[7],
-                                    response[8],
-                                    response[9],
-                                    response[10],
-                                    response[11],
-                                    
+                    response[1],
+                    response[2],
+                    response[3],
+                    response[4],
+                    response[5],
+                    response[6],
+                    response[7],
+                    response[8],
+                    response[9],
+                    response[10],
+                    response[11],
+                            
                 ],
                 backgroundColor: 'rgba(54, 162, 235, 0.7)',
                 borderWidth:1,

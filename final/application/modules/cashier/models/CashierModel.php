@@ -102,6 +102,7 @@ class CashierModel extends CI_Model {
     }
 
 
+
     public function getPaymentHistory($id){
 
         $this->db->select('*');
@@ -245,6 +246,25 @@ class CashierModel extends CI_Model {
 
     }
 
+
+    
+    function saveBulk($bulk){
+
+        if($this->db->insert("bulk", $bulk )){
+            return $response = array('msg' => "Successful");
+        }
+        else{
+            return $response = array('msg' => "Server Error");
+        }
+
+    }
+
+    function getData($tbl){
+
+        $query = $this->db->get($tbl);
+        return $query->result();
+
+    }
 
 
 

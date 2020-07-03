@@ -12,7 +12,11 @@
             <li class="nav-item">
                 <a class="nav-link" href="<?php echo base_url('cashier/cashierDashboard');?>">
                 <i class="cil-money"></i> Cashier Dashboard</a>
-            </li>            
+            </li>   
+            <li class="nav-item">
+                <a class="nav-link" href="<?php echo base_url('cashier/bulkWater');?>">
+                <i class="cil-money"></i> Bulk Water</a>
+            </li>          
         </ul>
     </nav>
 </div>

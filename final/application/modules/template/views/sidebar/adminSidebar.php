@@ -4,15 +4,15 @@
             <li class="nav-title ">ADMIN</li>
             <li class="nav-item">
                 <a class="nav-link" href="<?php echo base_url('admin/adminDashboard');?>">
-                    <i class="cil-monitor"></i> Admin Dashboard</a>
+                <i class="nav-icon icon-drop"></i> Admin Dashboard</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="<?php echo base_url('admin/permission');?>">
-                    <i class="cil-contact"></i> Customer Permission</a>
+                <i class="nav-icon icon-drop"></i> Customer Permission</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="<?php echo base_url('admin/dashboards');?>">
-                    <i class="cil-view-column"></i> Dashboards</a>
+                <i class="nav-icon icon-drop"></i> Dashboards</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="<?php echo base_url('admin/addHoliday');?>">

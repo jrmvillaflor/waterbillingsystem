@@ -112,10 +112,12 @@ class Accounts extends MY_Controller {
                         if($response['code'] == 201):
                             
                             $tbl = 'account_status';
-
+                            
+                            $date = new DateTime();
+                            
                             $account_status = array(
 
-                                'account_status_date' => $this->getTimeStamp(),
+                                'account_status_date' => $date->format('Y-m-d H:i:s'),
                                 'customer_account_id' => $customer_account_id,
                                 'account_status_type_id' => 1,
 

@@ -224,6 +224,44 @@ class Admin extends MY_Controller {
 
     }
 
+    function updateProfile(){
+
+        $profile = array(
+            'emp_id' => $this->input->post('empID'),
+            'firstname' => $this->input->post('fname'),
+            'lastname' => $this->input->post('lname'),
+            'gender' => $this->input->post('gender'),
+            'contactNo' => $this->input->post('contact'),
+            'accId' => $this->input->post('accID'),
+        );
+        $tbl = "employee_profile";
+        $pk = "emp_id";
+
+        $response = $this->AdminModel->doUpdate($tbl,$profile,$pk);
+        if($response["msg"] == "Successful"){
+
+
+            $profile_add = array(
+                'emp_id' => $this->input->post('empID'),
+                'emp_street' => $this->input->post('street'),
+                'emp_barangay' => $this->input->post('barangay'),
+                'emp_city' => $this->input->post('city'),
+                
+            );
+
+            $tbl = "emp_address";
+            $pk = "emp_id";
+
+            $response = $this->AdminModel->doUpdate($tbl,$profile_add,$pk);
+
+            if($response["msg"] == "Successful"){
+                print_r(json_encode($response));
+            }
+        }
+
+        
+    }
+
     function updateHoliday(){
 
         $holiday = array(
@@ -341,7 +379,7 @@ class Admin extends MY_Controller {
 
                 $profile = array(
 
-                    'emp_id' => $accId.'-prof',
+                    'emp_id' => $accId.'-emp',
                     'firstname' => $this->input->post('fname'),
                     'lastname' => $this->input->post('lname'),
                     'gender' => $this->input->post('gender'),
@@ -470,38 +508,63 @@ class Admin extends MY_Controller {
     public function checkUserActive(){
 
         $allCustomers = $this->AdminModel->getAllCustomer('Active');
+
+        // var_dump($allCustomers);
+        $user =0;
         foreach ($allCustomers as $v) {
             $data['records'] = $this->AdminModel->getRecords($v->customer_account_id);
             $data['payments'] = $this->AdminModel->payments($v->customer_account_id); 
    
-        $month = 0;
-        $cp = count($data['payments'])-1;
-        foreach($data['records'] as $rec){
-            foreach($data['payments'] as $p => $payment){
-                if($rec->date_of_reading == $payment->date_of_reading){
+            $month = 0;
+            $cp = count($data['payments'])-1;
+            
+            foreach($data['records'] as $rec){
 
-                    $month = 0;
-                    break;
-                }
-                else{
-                    if($cp == $p){
-                        $month++;
+                if(count($data['payments']) != null){
+                    foreach($data['payments'] as $p => $payment){
+                        if($rec->date_of_reading == $payment->date_of_reading){
+    
+                            $month = 0;
+                            break;
+                        }else{
+                            if($cp == $p){
+                                $month++;
+                            }
+                        }
                     }
                 }
+                else{
+
+                    if(count($data['records']) >= 2){
+                        $month = 2;
+                    }
+                }
+                 
+                $date = $rec->date_of_reading;
             } 
-            $date = $rec->date_of_reading;
-        }   
         
-    
-        
-                                                     //Date now
-            if(date('Y-m-d', strtotime($date. ' + 3 days')) > date("Y-m-d"))
-            {
-            $this->AdminModel->addStatus($v->customer_account_id,4);
-          
-            }
+            if($month == 2){
+                $dd1 = $this->AdminModel->getDueDate('Billing Due');// 14
+                $dd2 = $this->AdminModel->getDueDate('For Disconnection Due'); //3
+                
+                $due_date = Modules::run('cashier/workingDays', $date,$dd1[0]->due_days);
+
+                if(date("Y-m-d") > $due_date){
+                    $diss_conn = Modules::run('cashier/workingDays', $due_date ,$dd2[0]->due_days);
+                                    //date now
+                    if($diss_conn > date("Y-m-d")){
+                        // echo $diss_conn;
+                        $this->AdminModel->addStatus($v->customer_account_id,4);
+                        $user++;
+                    }
+                }
+
+            }                                                        //Date now
+
 
         }
+
+        echo(json_encode($user));
     }
 
 
@@ -529,9 +592,9 @@ class Admin extends MY_Controller {
                if ($key->amount==null) {
                 array_push($earnings,0);
                
-            } else {
-                array_push($earnings,$key->amount); 
-            }
+                } else {
+                    array_push($earnings,$key->amount); 
+                }
             }
             
             

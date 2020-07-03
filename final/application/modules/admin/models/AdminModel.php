@@ -182,7 +182,7 @@ class AdminModel extends CI_Model {
         $this->db->where($pk, $data[$pk]);
 
         if ($this->db->update($tbl, $data )) {
-            return $response = array( 'msg' => 'success' );
+            return $response = array( 'msg' => 'Successful' );
     
         }
         else{
@@ -280,6 +280,12 @@ class AdminModel extends CI_Model {
 
 
 
+public function getDueDate($name){
+        
+    $this->db->where('due_desc', $name);
 
+    $query = $this->db->get('due_dates');
+    return $query->result();
+}
 
 }

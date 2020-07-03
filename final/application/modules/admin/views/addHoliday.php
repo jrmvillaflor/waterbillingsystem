@@ -154,24 +154,31 @@
             holiday_name: $("#holiday").val(),
             holiday_date: $("#doh").val()
         };
-
-        $.ajax({
-            type:"POST",
-            data:data,
-            url:'<?php echo base_url('admin/saveHoliday');?>',
-            success: function(datas){
-                var data = $.parseJSON(datas);
-                
-                alert(data.msg);
-                location.reload();
-                
-            },
-            error: function(data){
-                alert(data.responseText);
-                // console.log(data);
-                // alert("Operation Failed");
-            }
-        });
+        
+        
+        
+        if( $("#holiday").val() != "" && $("#doh").val() != ""){
+            $.ajax({
+                type:"POST",
+                data:data,
+                url:'<?php echo base_url('admin/saveHoliday');?>',
+                success: function(datas){
+                    var data = $.parseJSON(datas);
+                    
+                    alert(data.msg);
+                    location.reload();
+                    
+                },
+                error: function(data){
+                    alert(data.responseText);
+                    // console.log(data);
+                    // alert("Operation Failed");
+                }
+            });
+        }
+        else{
+            alert("Empty Fields");
+        }
 
     });
 

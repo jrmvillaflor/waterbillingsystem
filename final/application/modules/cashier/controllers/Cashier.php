@@ -38,6 +38,37 @@ class Cashier extends MY_Controller {
 
     } 
 
+    function bulkWater(){
+
+        $data['title'] = 'Bulk Water';
+        $data['modules'] = 'cashier';
+        $data['sidebar']='sidebar/cashierSidebar';
+        $data['main_content'] = 'bulkWater';
+        echo Modules::run('template/main_content', $data);
+    }
+
+    // $date = new DateTime();
+    // echo $date->format('Y-m-d H:i:s');
+    function getBulk(){
+
+        $data['bulk'] = $this->CashierModel->getData('bulk');    
+        
+        echo($this->load->view("bulkTr", $data));
+    }
+
+    function saveBulk(){
+
+        $bulk = array(
+            "bulk_id" => 1,
+            "bulk_name" => $this->input->post("bulk_name"),
+            "bulk_cubic" => $this->input->post("bulk_cubic")
+        );
+
+        $response = $this->CashierModel->saveBulk($bulk);
+
+        print_r(json_encode($response));
+    }
+
     public function history(){
 
 
@@ -56,8 +87,7 @@ class Cashier extends MY_Controller {
                 $data['main_content'] = 'history';
                 echo Modules::run('template/main_content', $data);
             else:
-                
-                echo 'bugok';
+
 
             endif;
         endif;
@@ -173,7 +203,7 @@ class Cashier extends MY_Controller {
                     foreach($data['records'] as $r => $record){
                         $cr = count($data['records'])-1;
                         
-                        $total =0;
+                        $total = 0;
             
                         if($r == 0){
                             $prev = $record->reading_value;
@@ -223,7 +253,9 @@ class Cashier extends MY_Controller {
             
                     }
 
-                    $data['due_date'] = $this->workingDays($data['date']);
+                    $dd = $this->CashierModel->getDueDate('Billing Due');
+
+                    $data['due_date'] = $this->workingDays($data['date'],$dd[0]->due_days);
 
                     $check_date = date('Y-m-d', strtotime($data['due_date']. ' + 3 days'));
                     
@@ -259,26 +291,38 @@ class Cashier extends MY_Controller {
                     else{
                         $data['accountStatus'] = 'okay pa';
                     }
-                }
-              
-                foreach ($data['readings'] as $key => $value) {
-                    if($key == 0){
-                        $pres = $value->reading_value;
-                    }
-                    else{
-                        $prev = $value->reading_value;
+
+                    foreach ($data['readings'] as $key => $value) {
+                        if($key == 0){
+                            $pres = $value->reading_value;
+                        }
+                        else{
+                            $prev = $value->reading_value;
+                            
+                        }
+    
                         
                     }
 
-                    
+                    $consumed = $pres - $prev;
+                    $data['bill'] = $this->calculateBill($data['fees'][0]->account_type_code, $consumed);
+
                 }
 
-                $consumed = $pres - $prev;
+                if($result[0]->account_status_desc == 'Deactivate'){
+
+                    $data["bill"] = $data['fees'][0]->application_fee + $data['fees'][0]->advance_payments + $data['fees'][0]->connection_fee;
+
+                }
+                
+              
+                
+
+ 
 
 
 
                 
-                $data['bill'] = $this->calculateBill($data['fees'][0]->account_type_code, $consumed);
 
 
                 
@@ -520,35 +564,65 @@ class Cashier extends MY_Controller {
         $data['payments'] = $this->CashierModel->payments('20200067462020-LGO'); 
         $data['OP'] = $this->CashierModel->getPenalty('penalty');
 
-        $data['bill']= array();
+        $month = 0;
 
+        $cp = count($data['payments'])-1;
         
+        foreach($data['records'] as $rec){
+
+            foreach($data['payments'] as $p => $payment){
+
+                if($rec->date_of_reading == $payment->date_of_reading){
+                    echo "nag bayad tas na reset ang month ".$rec->date_of_reading;
+                    echo "<br>";
+                    $month = 0;
+                    break;
+                }
+                else{
+                    if($cp == $p){
+                        $month++;
+                    }
+                }
+            } 
+            $date = $rec->date_of_reading;
+
+        }   
+        echo $month;
+
+                                                         //Date now
+        if(date('Y-m-d', strtotime($date. ' + 3 days')) <= "2020-09-23" ){
+            echo "<br>";
+            echo "For Disconnection na";
+            echo "<br>";
+            echo "RUN the script";
+        }
+
+
         $p1 = 'guilaran';
         $p2 = 'sample';
 
-        $p1h =password_hash($p1, PASSWORD_DEFAULT, ['cost' => 8]);
+        // $p1h =password_hash($p1, PASSWORD_DEFAULT, ['cost' => 8]);
     
                 
-        $due = '2020-9-8';
-        echo date('Y-m-d', strtotime($due. ' + 3 days'));
-    
-
- 
-
+        // $due = '2020-9-8';
+        // $days = $this->CashierModel->getDueDate('');
+        // echo $days;
+        // echo '<br>';
+        // echo date('Y-m-d', strtotime($due. ' + '.$days.' days'));
 
     }
 
 
-    public function workingDays($date){
+    public function workingDays($date, $dd){
 
         // $sd = '2020-08-20'; 
         $d1 = date('Y-m-d', strtotime($date. ' + 1 days'));     
-        $due_date = $this->CashierModel->getDueDate('Billing Due');
+        $due_date = $dd;
         $holiday = $this->CashierModel->getHoliday(date('m', strtotime($date)));
         
         $i=1;
 
-        while ($i <= $due_date[0]->due_days ) {
+        while ($i <= $due_date) {
 
             if(date('m', strtotime($date)) != date('m', strtotime($d1))){
                 $holiday = $this->CashierModel->getHoliday(date('m', strtotime($d1)));
