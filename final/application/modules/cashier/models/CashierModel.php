@@ -101,6 +101,17 @@ class CashierModel extends CI_Model {
 
     }
 
+    public function doInsert($tbl, $data){
+
+        if($this->db->insert($tbl, $data )){
+            return TRUE;
+        }
+        else{
+            return false;
+        }
+
+    }
+
 
 
     public function getPaymentHistory($id){
@@ -280,6 +291,20 @@ class CashierModel extends CI_Model {
         }
     }
 
+
+    public function idChecker($tbl, $pk, $id){
+        $this->db->select($pk);
+        $this->db->from($tbl);
+        $this->db->where($pk, $id );
+        $query = $this->db->get()->result();
+        
+        if($query == null && $query != 0){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 
 
 

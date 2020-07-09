@@ -28,6 +28,7 @@ class Billing extends MY_Controller {
         
         $data['customers'] = $this->BillingModel->getAllCustomer();
 
+        // var_dump($data['customers'][0]->account_status_desc);
         $data['title'] = 'Billing Dashboard';
         $data['modules'] = 'billing';
         $data['sidebar']='sidebar/billingSidebar';
@@ -43,18 +44,18 @@ class Billing extends MY_Controller {
 
             $customer_Id = $this->uri->segment(3);
 
-            $data['infos'] = $this->BillingModel->customerInfo($customer_Id);
+            $data['infos'] = $this->BillingModel->customerInfo(null,$customer_Id);
 
             if($data['infos'] != null ):
 
-                $data['accounts'] = $this->BillingModel->getAccounts($customer_Id);
+                $data['accounts'] = $this->BillingModel->getAccounts(null,null,$customer_Id);
                 $data['records'] = $this->BillingModel->getRecords($data['infos'][0]->customer_account_id);
                 $data['payments'] = $this->BillingModel->payments($data['infos'][0]->customer_account_id); 
                 $data['OP'] = $this->BillingModel->getPenalty('penalty');
 
 
                 $code = $data['accounts'][0]->account_type_code;
-                $data['bill']= array();
+                // $data['bill']= array();
                 
 
                 foreach($data['records'] as $key => $rec ){
@@ -85,10 +86,46 @@ class Billing extends MY_Controller {
 
     }
 
+    function getLedger(){
+
+        $customer_Id = $this->input->post("custId");
+        
+        $data['infos'] = $this->BillingModel->customerInfo(null,$customer_Id);
+
+        $data['accounts'] = $this->BillingModel->getAccounts(null,$this->input->post("type_code"),$customer_Id);
+        $data['records'] = $this->BillingModel->getRecords($data['infos'][0]->customer_account_id);
+        $data['payments'] = $this->BillingModel->payments($data['infos'][0]->customer_account_id); 
+        $data['OP'] = $this->BillingModel->getPenalty('penalty');
+
+
+        $code = $this->input->post("type_code");
+        $data['bill']= array();
+        
+        print_r($data['infos']); 
+        if($data['records'] != null):
+            foreach($data['records'] as $key => $rec ){
+                if($key == 0 ){
+                    $prev = $rec->reading_value;
+                    $prev;
+                }
+                else{
+                    
+                    $consumed = $rec->reading_value - $prev;
+                    $prev = $rec->reading_value;
+
+                    $data['bill'][] = $this->calculateBill($code, $consumed);    
+                }
+            }
+        endif;
+
+        echo $this->load->view("trLedger", $data);
+
+    }
+
     public function addReading(){
 
         if($this->uri->segment(3)):
-            $customer_Id = $this->uri->segment(3);
+            $account_id = $this->uri->segment(3);
             
             
             // $this->form_validation->set_rules('readVal','Reading Value', 'required');
@@ -116,10 +153,11 @@ class Billing extends MY_Controller {
 
             if($this->form_validation->run() === FALSE):
                 
-                $data['accounts'] = $this->BillingModel->getAccounts($customer_Id);
+                $data['accounts'] = $this->BillingModel->getAccounts(null,null,$account_id);
                 // $data['readings'] = json_decode($this->getReading($data['accounts'][0]->customer_account_id));
-
-
+                // echo "<br>";
+                // echo $account_id;
+                // var_dump($data['accounts']);
                 $data['title'] = 'Customer Ledger';
                 $data['modules'] = 'billing';
                 $data['sidebar']='sidebar/billingSidebar';
@@ -142,13 +180,17 @@ class Billing extends MY_Controller {
                 else:
 
                     $tbl = 'meter_reading';
+                    $pk = 'meter_reading_id';
+
+                    $mr = $this->checkID($tbl,$pk);
                     $reading = array(
 
-                        'meter_reading_id' => 1,
+                        'meter_reading_id' => "mr".date('Y')."-".$mr,
                         'date_of_reading' => $this->input->post('DOR'),
                         'reading_value' => $this->input->post('readVal'),
                         'customer_account_id' => $this->input->post('type'),
-                        'print' => 0
+                        'print' => 0,
+                        "is_recieved" => 0,
 
                     );
 
@@ -180,12 +222,48 @@ class Billing extends MY_Controller {
         endif;
     }
 
+
+    function readingHistory(){
+        
+        if($this->uri->segment(3)):
+            $data["account_id"] = $this->uri->segment(3);
+            
+
+            // $data['accounts'] = $this->BillingModel->getAccounts($customer_Id,null,null);
+            
+            
+            $data['title'] = 'Reading History';
+            $data['modules'] = 'billing';
+            $data['sidebar']='sidebar/billingSidebar';
+            $data['main_content'] = 'readingHis';
+            echo Modules::run('template/main_content', $data);
+
+        endif;
+    } 
+
     public function getReading(){
         $id = '202000674605-POB';
         $id = $this->input->post('id');
         $reading = $this->BillingModel->getReadings($id);
     
         echo json_encode($reading);
+    }
+
+    function updateReading(){
+
+        $reading = array(  
+            "meter_reading_id" => $this->input->post("mrID"),
+            "date_of_reading" => $this->input->post("editDate"),
+            "reading_value" => $this->input->post("readVal")
+        );
+
+        $tbl = "meter_reading";
+        $pk = "meter_reading_id";
+
+        $response = $this->BillingModel->doUpdate($tbl,$reading,$pk);
+
+        print_r(json_encode($response));
+
     }
 
 
@@ -253,7 +331,6 @@ class Billing extends MY_Controller {
                     
                     
                     $asd = $subcon * $value->account_type_price;
-                    $asd;
                     
 
                     $total += $subcon * $value->account_type_price;	
@@ -424,109 +501,140 @@ class Billing extends MY_Controller {
 
 
 
-        public function customerBill($id){
+    public function customerBill($id){
 
-            if($this->uri->segment(3)):
-                $this->load->library('pdf');
-    
-                $customer_Id = $this->uri->segment(3);
-                $data['userInfo'] = $this->BillingModel->customerInfo($id);
-                $data['readings'] = $this->BillingModel->monthlyReading($data['userInfo'][0]->customer_account_id);
-    
-                $data['fees'] = $this->BillingModel->toPay($data['userInfo'][0]->customer_account_id,"Active");
-    
+        if($this->uri->segment(3)):
+            $this->load->library('pdf');
+
+            $acc_id = $this->uri->segment(3);
+            $data['userInfo'] = $this->BillingModel->customerInfo(null,$acc_id);
+            $data['readings'] = $this->BillingModel->monthlyReading($data['userInfo'][0]->customer_account_id);
+
+            $data['fees'] = $this->BillingModel->toPay($data['userInfo'][0]->customer_account_id,"Active");
+
+            if($data['readings'] != null && count($data['readings']) != 1):
                 // getting Arrears 
                 $data['records'] = $this->BillingModel->getRecords($data['userInfo'][0]->customer_account_id);
                 $data['payments'] = $this->BillingModel->payments($data['userInfo'][0]->customer_account_id); 
                 $data['OP'] = $this->BillingModel->getPenalty('penalty');
-    
-    
-                
-                    foreach($data['records'] as $r => $record){
-                        $cr = count($data['records'])-1;
-                        
-                        $total =0;
-            
-                        if($r == 0){
-                            $prev = $record->reading_value;
-                            $balance = 0;
-                        }else{
-                            if ($balance == 0) {
-                                $overdue = 0;
-                            }else{
-                                $overdue = round($balance,2);
-                            }
-                            if($overdue == 0){
-                                $penalty = 0;
-                            }else{
-                                $penalty = round($overdue * $data['OP'][0]->op_value,2);
-                            }
-            
-                            foreach ($data['payments'] as $p => $payment) {
-            
-                                $cp = count($data['payments'])-1;
-                                
-                                $con = $record->reading_value-$prev;
-                                $b = $this->calculateBill($data['records'][0]->account_type_code, $con);
-            
-                                $total = round($overdue+$b+$penalty,2);
-                                
-                                if($record->date_of_reading == $payment->date_of_reading ){
+
+                $cr = count($data['records'])-1;
+                $cp = count($data['payments'])-1;
+
+
+                $balance = 0;
+                $total = 0;
+                $arrears = 0;
+                $data["arrears"] = 0;
+                foreach($data['records'] as $kr => $record):
+                    
+                    if($kr == 0):
+                        $prev = $record->reading_value;
+
+                    else:
+                        if($balance == 0):
+                            $overdue = 0;
+                        else:
+                            $overdue = round($balance,2);
+                        endif;
+
+                        if($overdue == 0):
+                            $penalty = 0;
+                        else:
+                            $penalty = round($overdue * $data['OP'][0]->op_value,2);
+                        endif;
+
+                        $con = $record->reading_value-$prev;
+                        // echo "<br>";
+                        $monthBill = $this->calculateBill($data['records'][0]->account_type_code, $con);
+                        $total = $monthBill+$overdue+$penalty;
+
+                        if($data['payments'] != null):
+                            foreach($data['payments'] as $kp => $payment):
+                                if($record->date_of_reading == $payment->date_of_reading ):
                                     $amount = $payment->amount;
                                     break;
-                                }
-                                else{
-                                    if ($cp == $p) {
+                                else:
+                                    if($cp == $kp):
                                         $amount = 0;
-                                    }    
-                                }                           
-                            }
-            
-                            $balance = round($total - $amount,2);
-                            
-                            if($cr != $r){
-                                $arrears = $balance + round($balance * $data['OP'][0]->op_value,2);
-                                $data['arrears'] = $arrears;
-                            }
-                            
-                            $data['date'] = $record->date_of_reading;
-                            $prev = $record->reading_value;
-                        }
-                    }
-    
-                    foreach ($data['readings'] as $key => $value) {
-                        if($key == 0){
-                            $pres = $value->reading_value;
-                        }
-                        else{
-                            $prev = $value->reading_value;
-                            
-                        }
-    
+                                    endif;
+                                endif;
+                            endforeach;
+                        else:
+                            $amount = 0;
+                        endif;
+
+                        $balance = $total - $amount;
+
+                        if($cr != $kr):
+                            $arrears = $balance; 
+                            $data["arrears"] = $arrears;
                         
-                    }
-    
-                    $consumed = $pres - $prev;
-    
-    
-    
-                    
-                    $data['bill'] = $this->calculateBill($data['fees'][0]->account_type_code, $consumed);
-                    $data['due_date'] = $this->workingDays($data['date']);
-    
-                    $this->load->view('billing/customerBill',$data);
-    
-                    $html = $this->output->get_output();
-    
-                    $this->pdf->loadHTML($html);
-                    $this->pdf->render();
-                    $this->pdf->stream("Bill.pdf",array("Attachment"=>0));
-    
+                        endif;
+
+                        // echo "<br>";
+                        
+                        $data['date'] = $record->date_of_reading;
+                        $prev = $record->reading_value;
+                    endif;
+                endforeach;
+
+                // foreach($data['readings'] as $key => $value):
+                //     if($key == 0):
+                //         $pres = $value->reading_value;
+                //     else:
+                //         $prev = $value->reading_value;
+                //     endif;  
+                // endforeach;
+                
+                
+                $pres = $data['readings'][0]->reading_value;
+                $prev = $data['readings'][1]->reading_value;
+                
+                $consumed = $pres - $prev;
+            
+                $data['bill'] = $this->calculateBill($data['fees'][0]->account_type_code, $consumed);
+                $data['due_date'] = $this->workingDays($data['date']);
+
+
+                // echo "ang bill = ".$data["bill"];
+                // echo "<br>";
+                // echo "ang arrears = ".$data["arrears"];
+                // echo "<br>";
+                // echo $data["arrears"]*$data["OP"][0]->op_value;
+                // echo "<br>";
+                // print_r($data["OP"][0]->op_value);
+                $this->load->view('billing/customerBill',$data);
+
+                $html = $this->output->get_output();
+
+                $this->pdf->loadHTML($html);
+                $this->pdf->render();
+                ob_end_clean();
+                $this->pdf->stream($acc_id+".pdf",array("Attachment"=>0));
+                
+            else:
+
+                echo "No record yet";
+
+                ?>
+                    <script type="text/javascript">
+                        alert('No Available Records ');
+                        document.location = '<?php echo base_url('billing/billingDashboard') ?>';
+                    </script>
+                <?php
             endif;
-        }
-    
-    
-    
+
+        endif;
+    }
+
+
+    function test(){
+
+        $due_date = $this->BillingModel->getDueDate('billing due days');
+
+        print_r($due_date);
+    }
 
 
     public function workingDays($date){
@@ -534,7 +642,7 @@ class Billing extends MY_Controller {
         // $sd = '2020-08-20'; 
         $d1 = date('Y-m-d', strtotime($date. ' + 1 days'));     
         
-        $due_date = $this->BillingModel->getDueDate('billing due days');
+        $due_date = $this->BillingModel->getDueDate('Billing Due');
         $holiday = $this->BillingModel->getHoliday(date('m', strtotime($date)));
         
         $i=1;
@@ -621,6 +729,34 @@ class Billing extends MY_Controller {
         $this->pdf->loadHTML($html);
         $this->pdf->render();
         $this->pdf->stream("welcome.pdf",array("Attachment"=>0));
+    }
+
+
+
+    public function checkID($table, $pkeyName){
+
+        $checkID = false;
+        while($checkID == false){
+            $id = $this->idGenerator();
+            $checkID = $this->BillingModel->idChecker($table, $pkeyName, $id);
+        }
+
+        return $id;
+
+    }
+
+
+    public function idGenerator()
+    {
+
+    	$date = date('Y');
+		$uid = '';
+
+		while (	strlen($uid) != 6 ) {
+			$uid .= strval(rand(0,9));
+		}
+
+		return $uid;
     }
 }
 

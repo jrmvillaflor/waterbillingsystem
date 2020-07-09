@@ -16,7 +16,7 @@
             </li>
         </ul>
 
-        <div class="row mt-4">
+        <!-- <div class="row mt-4">
             <div class="col-md-5">
                 
                 <div class="form-group">
@@ -40,10 +40,10 @@
                 
             
             </div>
-        </div>
+        </div> -->
 
    
-        <div class="row mt-3">
+        <div class="row mt-4">
             <div class="col-md-12">
                 <table class="table table-bordered">
                     <thead class="thead-dark">

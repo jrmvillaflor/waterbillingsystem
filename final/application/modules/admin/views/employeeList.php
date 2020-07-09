@@ -19,20 +19,19 @@
                         <th>Email</th>                   
                         <th>Password</th>                   
                         <th>Position</th> 
-                        <th>status</th>  
                         <th>Manage</th>                                   
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach($employees as $emp):?>
-                        <tr style="cursor:pointer" onclick="document.location='<?php echo base_url('admin/employeeDetails/').$emp->accId?>'">
-                            <td><?php echo $emp->accId?></td>
+                        <!-- <tr style="cursor:pointer" onclick="document.location='<?php echo base_url('admin/employeeDetails/').$emp->accId?>'"> -->
+                        <tr>
+                            <td><a href="<?php echo base_url('admin/employeeDetails/').$emp->accId?>"><?php echo $emp->accId?></a></td>
                             <td><?php echo $emp->email?></td>
                             <td><?php echo $emp->password?></td>
                             <td><?php echo $emp->user_type_desc?></td>
-                            <td>Active</td>
                             <td>
-                                <button class="btn btn-danger" id="">Delete</button>
+                                <button class="btn btn-danger" emp-id="<?php echo $emp->accId?>" emp-email="<?php echo $emp->email?>" onclick="showDelete(this)">Delete</button>
                             </td>
                         </tr>
                     <?php endforeach;?>
@@ -66,38 +65,41 @@
 
 <script>
 
+    let accID;
+    
     function showDelete(btn){
         $("#deleteModal").modal();
-        dueID = $(btn).attr("due-id");
-        var name = $(btn).attr("due-name");
-        $("#mess").text("Do you really want to delete "+ name +"?")
+        accID = $(btn).attr("emp-id");
+        var email = $(btn).attr("emp-email");
+        $("#mess").text("Do you really want to delete "+ email +" ?")
     }
 
     $("#doDelete").on('click', function(){
 
     $("#deleteModal").modal("hide");
         data = {
-            due_id: dueID
+            acc_id: accID,
+            emp_id: accID+"-emp"
         }
 
         console.log(data);
 
-        // $.ajax({
-        //     type:"POST",
-        //     data: data,
-        //     url:'<?php echo base_url('admin/deleteDue');?>',
-        //     success: function(datas){
-        //         var data = $.parseJSON(datas);
+        $.ajax({
+            type:"POST",
+            data: data,
+            url:'<?php echo base_url('admin/deleteEmp');?>',
+            success: function(datas){
+                var data = $.parseJSON(datas);
                 
-        //         alert(data.msg);
-        //         location.reload();
+                alert(data.msg);
+                location.reload();
                 
-        //     },
-        //     error: function(data){
-        //         alert(data.responseText);
-        //         // console.log(data);
-        //         alert("Operation Failed");
-        //     }
-        // });
+            },
+            error: function(data){
+                alert(data.responseText);
+                // console.log(data);
+                alert("Operation Failed");
+            }
+        });
     })
 </script>

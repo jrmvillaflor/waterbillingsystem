@@ -38,17 +38,17 @@
                                 <strong>Profile</strong>
                             </div>
                             <div class="col-md-1">
-                                <button class="btn btn-success" acc-id="<?php echo $account[0]->accId?>" onclick="editProf(this)">Edit</button>
+                                <button class="btn btn-success" acc-id="<?php echo $profile[0]->accId?>" emp-id="<?php echo $profile[0]->emp_id?>" onclick="editProf(this)">Edit</button>
                             </div>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 col-form-label">
-                                First Name: <Strong><?php echo ($profile==NULL?'':$profile[0]->firstname)?></Strong> 
+                                First Name: <Strong id="first-name"><?php echo $profile[0]->firstname?></Strong> 
                             </div>
                             <div class="col-md-6 col-form-label">
-                                Last Name: <Strong><?php echo ($profile==NULL?'':$profile[0]->lastname)?></Strong>
+                                Last Name: <Strong id="last-name"><?php echo ($profile==NULL?'':$profile[0]->lastname)?></Strong>
                             </div>
                         </div>
                         <div class="row">
@@ -56,20 +56,20 @@
                                 Gender: <Strong><?php echo ($profile==NULL?'':$profile[0]->gender)?></Strong> 
                             </div>
                             <div class="col-md-6 col-form-label">
-                                Contact Number: <Strong><?php echo ($profile==NULL?'':$profile[0]->contactNo)?></Strong>
+                                Contact Number: <Strong id="contactNo"><?php echo ($profile==NULL?'':$profile[0]->contactNo)?></Strong>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 col-form-label">
-                                Street: <Strong><?php echo ($profile==NULL?'':$profile[0]->emp_street)?></Strong>
+                                Street: <Strong id="street"><?php echo ($profile==NULL?'':$profile[0]->emp_street)?></Strong>
                             </div>
                             <div class="col-md-6 col-form-label">
-                                Barangay: <Strong><?php echo ($profile==NULL?'':$profile[0]->emp_barangay)?></Strong>
+                                Barangay: <Strong id="barangay"><?php echo ($profile==NULL?'':$profile[0]->emp_barangay)?></Strong>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 col-form-label">
-                                City/Province: <Strong><?php echo ($profile==NULL?'':$profile[0]->emp_city)?></Strong>
+                                City/Province: <Strong id="city"><?php echo ($profile==NULL?'':$profile[0]->emp_city)?></Strong>
                             </div>
                             
                         </div>
@@ -108,7 +108,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="">Contact Number</label>
-                        <input type="text" class="form-control" placeholder="Contact Number" id="contact">
+                        <input type="text" class="form-control" placeholder="Contact Number" id="editContact">
                     </div>
                 </div>
                 <div class="row">
@@ -118,15 +118,15 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="">Street</label>
-                        <input type="text" class="form-control" placeholder="Street" id="street">
+                        <input type="text" class="form-control" placeholder="Street" id="editStreet">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="">Barangay</label>
-                        <input type="text" class="form-control" placeholder="Barangay" id="barangay">
+                        <input type="text" class="form-control" placeholder="Barangay" id="editBarangay">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="">City/Province</label>
-                        <input type="text" class="form-control" placeholder="City" id="city">
+                        <input type="text" class="form-control" placeholder="City" id="editCity">
                     </div>
                 </div>
             </div>
@@ -152,59 +152,65 @@
     function editProf(btn){
 
         accID = $(btn).attr("acc-id");
-        empID = $(btn).attr("acc-id")+"-emp";
+        empID = $(btn).attr("emp-id");
         $("#editProfile").modal();
-        console.log(accID);
+
+        $("#fname").val($("#first-name").text());
+        $("#lname").val($("#last-name").text());
+        $("#editContact").val($("#contactNo").text());
+        $("#editStreet").val($("#street").text());
+        $("#editBarangay").val($("#barangay").text());
+        $("#editCity").val($("#city").text());
+
+        console.log(f);
     }
 
     $("#saveProfile").on("click", function(){
         var fname = $("#fname").val();
         var lname = $("#lname").val();
-        var contact = $("#contact").val();
+        var contact = $("#editContact").val();
         var gender = $("#gender").val();
-        var street = $("#street").val();
-        var barangay = $("#barangay").val();
-        var city = $("#city").val();
+        var street = $("#editStreet").val();
+        var barangay = $("#editBarangay").val();
+        var city = $("#editCity").val();
 
-        if(fname == "" && lname == "" && contact == "" && gender == "" && street == "" && barangay == "" && city == ""){
-            data ={
-                empID: empID,
-                fname: fname,
-                lname: lname,
-                gender: gender,
-                street: street,
-                contact: contact,
-                barangay: barangay,
-                city: city,
-                accID: accID,
-            }
+        data ={
 
-            console.log(data);
-            $("#editProfile").modal("hide");
-    
-
-            // console.log(data);
-
-            $.ajax({
-                type:"POST",
-                data:data,
-                url:"<?php echo base_url('admin/updateProfile');?>",
-                success: function(datas){
-                    var data = $.parseJSON(datas);
-                    
-                    alert(data.msg);
-                    location.reload();
-                    
-                },
-                error: function(data){
-                    alert(data.responseText);
-                    // console.log(data);
-                    // alert("Operation Failed");
-                }
-            });
-        }else{
-            alert("Empty Fields");
+            empID: empID,
+            fname: fname,
+            lname: lname,
+            gender: gender,
+            street: street,
+            contact: contact,
+            barangay: barangay,
+            city: city,
+            accID: accID,
         }
+
+        console.log(data);
+        
+
+
+        // console.log(data);
+
+        $.ajax({
+            type:"POST",
+            data:data,
+            url:"<?php echo base_url('admin/updateProfile');?>",
+            success: function(datas){
+                var data = $.parseJSON(datas);
+    
+                alert(data.msg);
+                location.reload();
+                
+            },
+            error: function(data){
+                alert(data.responseText);
+                // console.log(data);
+                // alert("Operation Failed");
+            }
+        });
+    
     })
 
 </script>

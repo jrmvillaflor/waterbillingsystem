@@ -44,9 +44,9 @@
         </div> -->
         <div class="row mt-5">
             <div class="col-md-3">
-                <select name="" class="form-control"id="type">
+                <select name="" class="form-control" id="type">
                     <?php foreach($types as $type):?>
-                        <option value="<?php echo $type->account_type_desc?>"><?php echo $type->account_type_desc?></option>
+                        <option value="<?php echo $type->account_type_code?>"><?php echo $type->account_type_desc?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -59,8 +59,8 @@
                         <tr>
                             <th>From</th>
                             <th>To</th>
-                            <th>Rates</th>
-                            <th width='150'>Edit</th>
+                            <th>Price</th>
+                            <th width='150'>Edit Price</th>
                             
                         </tr>
                     </thead>
@@ -78,18 +78,29 @@
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <strong id="type_desc"></strong>
+            <div class="modal-header bg-primary">
+                <strong>Edit Price</strong>
             </div>
             <div class="modal-body" >
                 <div class="row">
+                    <input type="hidden" id="cubic_id">
+                    <input type="hidden" id="type_code">
+                    <div class="col-md-6">
+                        <label for="">From</label>
+                        <p><strong id="edit_from"></strong></p> 
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">To</label>
+                        <p><strong id="edit_to"></strong></p>
+                    </div>
                         
-                    <div class="col-md-12">
-                        <input type="hidden" id="cubic_id">
-                        <input type="hidden" id="type_code">
+                        
+                    <!-- <div class="col-md-12">
+
                         <div class="form-group">
                             <label for="">From</label>
-                            <input type="text" class="form-control" id="edit_from" placeholder="Range From" >
+                            <p><strong id="edit_from"></strong></p>
+                            <input type="text" class="form-control disabled" id="edit_from" placeholder="Range From" >
                         </div>  
                     
                     </div>
@@ -98,10 +109,11 @@
                         
                         <div class="form-group">
                             <label for="">To</label>
+                            <p><strong id="edit_to"></strong></p>
                             <input type="text" class="form-control" id="edit_to" placeholder="Range To" >
                         </div>  
                     
-                    </div>
+                    </div> -->
                     <div class="col-md-12">
                         
                         <div class="form-group">
@@ -151,7 +163,7 @@
             success: function(datas){
                 var data = $.parseJSON(datas);
                 // $("table tbody").remove();
-                // console.log(datas);
+                console.log(datas);
                 // alert("data is ready");
                 $("table tbody tr").remove();
                 $.each(data, function(i, value){    
@@ -169,24 +181,26 @@
 
     function showEdit(btn){
         $("#editModal").modal()
-        $("#type_desc").text($("#type").val());
+        // $("#type_desc").text($("#type").val());
         $("#cubic_id").val($(btn).attr("cubic-id"));
-        $("#type-code").val($(btn).attr("type-code"));
-        $("#edit_from").val($(btn).attr("cubic-from"));
-        $("#edit_to").val($(btn).attr("cubic-to"));
+        $("#type_code").val($(btn).attr("type-code"));
+        $("#edit_from").text($(btn).attr("cubic-from"));
+        $("#edit_to").text($(btn).attr("cubic-to"));
         $("#edit_price").val($(btn).attr("cubic-price"));
+
+
+        console.log($(btn).attr("cubic-id"));
     }
 
     $("#saveEdit").on("click", function(){
         $("#editModal").modal("hide");
         data = {
-            cubic_id: $("#edit_id").val(),
-            cubic_to: $("#edit_to").val(),
-            cubic_from: $("#edit_from").val(),
+            cubic_id: $("#cubic_id").val(),
             cubic_price: $("#edit_price").val(),
+            cubic_code: $("#type_code").val()
         };
 
-        // console.log(data);
+        console.log(data);
         $.ajax({
             type:"POST",
             data:data,
@@ -195,7 +209,7 @@
                 var data = $.parseJSON(datas);
                 
                 alert(data.msg);
-                getCubicRates($("#type").val());
+                getCubicRates($("#type_code").val());
                 
             },
             error: function(data){

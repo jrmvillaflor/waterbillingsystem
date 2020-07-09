@@ -109,6 +109,8 @@ class Admin extends MY_Controller {
         echo Modules::run('template/main_content', $data);
 
         // print_r($data['profile']);
+        // print_r($data['account']);
+
     }
 
     function pendingEmployees(){
@@ -308,9 +310,7 @@ class Admin extends MY_Controller {
     }
 
     function test(){
-        $response = array( 'msg' => 'success' );
 
-        echo $response['msg'];
     }
 
     function getCubicRates(){
@@ -322,38 +322,22 @@ class Admin extends MY_Controller {
 
     function updateCubicRates(){
 
-        $cubic = array(
-            'cubic_range_id' => $this->input->post('cubic_id'),
-            'cubic_range_from' => $this->input->post('cubic_from'),
-            'cubic_range_to' => $this->input->post('cubic-to'),
+        $price = array(
+            'account_type_price' => $this->input->post('cubic_price'),
+            'account_type_code' => $this->input->post('cubic_code'),
+            'cubic_range_id' => $this->input->post('cubic_id')
         );
-        $tbl = "cubic_range";
+        $tbl = "account_type_fees";
         $pk = "cubic_range_id";
+        $pk1 = "account_type_code";
 
-        $response = $this->AdminModel->doUpdate($tbl,$cubic,$pk);
+        $response = $this->AdminModel->updatePrice($tbl,$price,$pk,$pk1);
 
-        if($response['msg']){
-            $price = array(
-                'account_type_price' => $this->input->post('cubic_id'),
-                'account_type_code' => $this->input->post('cubic_code'),
-                'cubic_range_id' => $this->input->post('cubic_id')
-            );
-            $tbl = "account_type_fees";
-            $pk = "cubic_range_id";
-    
-            $response = $this->AdminModel->doUpdate($tbl,$price,$pk);
-
-            if($response['msg']){
-                print_r(json_encode($response));
-            }else{
-                print_r(json_encode(array("msg" => "price failed")));
-            }
-        }else{
-            print_r(json_encode(array("msg" => "Cubic failed")));
-        }
-       
+        print_r(json_encode($response));
+            
 
     }
+
 
     function saveEmployee(){
         if(!empty($this->input->post())){
@@ -397,7 +381,7 @@ class Admin extends MY_Controller {
                         "emp_street" => $this->input->post('street'),
                         "emp_barangay" => $this->input->post('barangay'),
                         "emp_city" => $this->input->post('city'),
-                        'emp_id' => $accId.'-prof',
+                        'emp_id' => $accId.'-emp',
 
                     );
 
@@ -405,7 +389,7 @@ class Admin extends MY_Controller {
                     $response = $this->AdminModel->saveEmployee($address,$table);
 
                     if($response){
-                        print_r(json_encode(array( 'msg' => 'success')));
+                        print_r(json_encode(array( 'msg' => 'Successful')));
                     }
 
                 }else{
@@ -493,7 +477,7 @@ class Admin extends MY_Controller {
     }
     public function getAllUserForReconnection(){
         $data['user'] = $this->AdminModel->getAllCustomer("For Reconnection"); 
-        print_r($this->load->view("widget_table", $data)); 
+        print_r($this->load->view("widget_table_special", $data)); 
     }
     public function getAllUserForDisconnection(){
         $data['user'] = $this->AdminModel->getAllCustomer("For Disconnection");  
@@ -571,14 +555,28 @@ class Admin extends MY_Controller {
     public function disconnectCustomer($id){
         $this->AdminModel->addStatus($id,3);
 
-                        ?>
-                        <script type="text/javascript">
-                            alert('success');
-                            document.location = '<?php echo base_url('admin/adminDashboard');?>';
+        ?>
+        <script type="text/javascript">
+            alert('success');
+            document.location = '<?php echo base_url('admin/adminDashboard');?>';
 
-                        </script>
-                        <?php
+        </script>
+        <?php
     } 
+
+    function reconnectCustomer($id){
+
+        $this->AdminModel->addStatus($id,2);
+
+        ?>
+        <script type="text/javascript">
+            alert('success');
+            document.location = '<?php echo base_url('admin/adminDashboard');?>';
+
+        </script>
+        <?php
+
+    }
 
     public function earnings() {
 
@@ -603,6 +601,35 @@ class Admin extends MY_Controller {
         print_r(json_encode($earnings));
      
       
+    }
+
+
+    function deleteEmp(){
+
+        $pk = "emp_id";
+        $tbl = "emp_address";
+
+        $response = $this->AdminModel->doDelete($this->input->post("emp_id"),$pk, $tbl);
+
+        if($response["msg"] == "Successful"):
+
+            $pk = "emp_id";
+            $tbl = "employee_profile";
+    
+            $response = $this->AdminModel->doDelete($this->input->post("emp_id"),$pk, $tbl);
+    
+            if($response["msg"] == "Successful"):
+
+                $pk = "accId";
+                $tbl = "account";
+        
+                $response = $this->AdminModel->doDelete($this->input->post("acc_id"),$pk, $tbl);
+
+                print_r(json_encode($response));
+            endif;
+
+        endif;
+
     }
 
 

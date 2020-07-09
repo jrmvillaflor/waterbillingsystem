@@ -5,9 +5,10 @@
             <div class="col-md-6">
                 <div class="row">
                     <div class="col-md-5">
-                        <select class="form-control">
+                        <input type="hidden" value="<?php echo $infos[0]->customer_account_id?>" id="cust-id">
+                        <select class="form-control float-left" id="type-code">
                             <?php foreach($accounts as $account):?>
-                                <option value=""><?php echo $account->account_type_desc?></option>        
+                                <option value="<?php echo $account->account_type_code?>"><?php echo $account->account_type_desc?></option>        
                             <?php endforeach;?>
                         </select>
                     </div>
@@ -16,8 +17,8 @@
                     </div> -->
                 </div> 
             </div>
-            <div class="col-md-6">
-                <a class="" href="<?php echo base_url("billing/newAccount/").$infos[0]->customer_id;?>">
+            <div class="col-md-6 ">
+                <a class="float-right" href="<?php echo base_url("billing/newAccount/").$infos[0]->customer_id;?>">
                     <span style="color: gray;">NEW ACCOUNT</span>
                 </a>
             </div>
@@ -68,92 +69,47 @@
                                 <th>Balance</th>
                             </tr>
                         </thead>
-                        <tbody class="tbody-light">
-                            <?php if($records != null):?>
-                                <?php foreach($records as $i => $record):?>
-                                    <?php if($i == 0):?>
-                                        <?php $prevReading = $record->reading_value?>
-                                        <?php $balance =0;?>
-                                    <?php else:?>
-                                        <tr class="text-center">
-                                            <td><?php echo nice_date($record->date_of_reading, 'M-Y');?></td>
-                                            <td><?php echo $record->reading_value;?></td>
-                                            <td><?php echo $prevReading;?></td>
-                                            <td><?php echo $record->reading_value - $prevReading?></td>
-                                            <td><?php echo $bill[$i-1]?></td>
-                                            <td>
-                                                <?php if($balance == 0):?>
-                                                    ------------
-                                                    <?php $overdue=0;?>
-                                                <?php else:?>
-                                                    <?php  
-                                                    echo $overdue = round($balance,2);
-                                                    
-                                                    ?>
-                                                <?php endif?>
-                                            </td>
-                                            <td>
-                                                <?php if($overdue == 0):?>
-                                                    ------------
-                                                    <?php $penalty = 0;?>
-                                                <?php else:?>
-                                                    <?php 
-                                        
-                                                        echo $penalty = round($overdue * $OP[0]->op_value,2);
-                                                    ?>
-                                                <?php endif?> 
-                                            </td>
-                                            <td> 
-                                                <?php 
-                                                    
-                                                    echo $total = round($bill[$i-1]+$overdue+ $penalty,2);
-                                                ?>
-                                            </td>
-                                            <?php if($payments != null):?>
-                                                <?php $k = count($payments)-1; $ammount = 0;?>
-                                                <?php foreach($payments as $key => $payment):?>
-                                                    <?php if($payment->date_of_reading == $record->date_of_reading):?>
-                                                        <td><?php echo $payment->payment_date?></td>
-                                                        <td><?php echo $payment->OR_number?></td>
-                                                        <td><?php echo $amount = $payment->amount?></td>
-                                                        <?php break;?>
-                                                    <?php else: ?>
-                                                        <?php if($k == $key):?>
-                                                            <td>------------</td>
-                                                            <td>------------</td>
-                                                            <td>------------</td>
-                                                            <?php $amount = 0?>
-                                                        <?php endif;?>
-                                                    <?php endif;?>
-                                                <?php endforeach;?>
-                                            <?php else:?>
-                                                <td>------------</td>
-                                                <td>------------</td>
-                                                <td>------------</td>
-                                                <?php $amount = 0?>
-                                            <?php endif;?>
-                                            <td>
-                                                <?php 
-                                                    echo $balance = round($total - $amount, 2);
-                                                ?>
-                                            </td>
-                                        </tr>
-                                        <?php $prevReading = $record->reading_value?>
-                                    <?php endif;?>
-                                <?php endforeach;?>
-                            <?php endif;?>
+                        <tbody class="tbody-light" id="ledgerBody">
+                            
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-
-        <?php if($records == null):?>
-            <div class="text-center">
-                <div class=" mx-auto" data-text=""><img src="<?php echo base_url('assets/images/undraw_no_data_qbuo.svg');?>" width="100"></div>
-                <p class="lead text-gray-800 mb-5">No Found Data</p>
-                <p class="text-gray-500 mb-0">It looks no data has been recorded.</p>
-            </div>
-        <?php endif;?>
     </div>
 </div>
+
+
+<script>
+
+    // console.log($('select#type-code').val());
+
+    function getLedger(code){
+
+        data = {
+            custId: $('#cust-id').val(),
+            type_code: code, 
+        }
+
+        console.log(data);
+
+        $.ajax({
+            type:"POST",
+            data: data,
+            url:'<?php echo base_url('billing/getLedger');?>',
+            success: function(datas){
+                $("#ledgerBody").html(datas);
+            },
+            error: function(data){
+                alert(data.responseText);
+                // console.log(data);
+                alert("Operation Failed");
+            }
+        });
+    }
+
+    $( function() {
+        
+        getLedger($('select#type-code').val());
+    });
+</script>

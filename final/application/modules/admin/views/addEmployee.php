@@ -113,7 +113,7 @@
         var lname = $("#lname").val();
         var gender = $("#gender").val();
         var contact = $("#contact").val();
-        var street = $("#pos").val();
+        var street = $("#street").val();
         var barangay = $("#barangay").val();
         var city = $("#city").val();
 

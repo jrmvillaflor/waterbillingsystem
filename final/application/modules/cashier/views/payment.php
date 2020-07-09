@@ -111,29 +111,29 @@
                     <strong>Payment Form</strong>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="<?php echo base_url('cashier/payment/').$infos[0]->customer_account_id;?>">
+                    <!-- <form method="POST" action="<?php echo base_url('cashier/payment/').$infos[0]->customer_account_id;?>"> -->
                         <div class="form-group">
+                            <input type="hidden" id="acc-id" value="<?php echo $infos[0]->customer_account_id ?>">
+                            <input type="hidden" id="acc-status" value="<?php echo $status ?>">
+                            
                             <label for="ORnumber">O.R. Number</label>
-                            <input type="text" class="form-control" placeholder="" name="ORnumber" value="<?php echo set_value('ORnumber');?>">
-                            <span class="text-danger"><?php echo form_error('ORnumber'); ?></span>
+                            <input type="text" class="form-control" placeholder="" id="ORnumber" value="">
                         </div>
 
                         <div class="form-group">
                             <label for="amount">Amount</label>
-                            <input type="text" class="form-control" placeholder="" name="amount" value="<?php echo set_value('amount');?>">
-                            <span class="text-danger"><?php echo form_error('amount'); ?></span>
+                            <input type="text" class="form-control" placeholder="" id="p-amount" value="">
                         </div>
 
                         <div class="form-group">
                             <label for="DOP">Date of Payment</label>
-                            <input type="text" id="paymentDate" class="form-control" id="street" placeholder="date" name="DOP" value="<?php echo set_value('DOP');?>">
-                            <span class="text-danger"><?php echo form_error('DOP'); ?></span>
+                            <input type="text" id="paymentDate" class="form-control"  placeholder="date"  value="">
                         </div>
 
 
                         <div class="form-group">
                             <label for="method">Payment Method</label>
-                            <select name="method" class="form-control">
+                            <select id="p-method" class="form-control">
                                 <?php if($methods != null):?>
                                     <?php foreach($methods as $method):?>
                                         <option value="<?php echo $method->payment_method_id?>"><?php echo $method->payment_method_desc?></option>
@@ -146,7 +146,7 @@
 
                         <div class="form-group">
                             <label for="type">Payment Type</label>
-                            <select name="type" id="sel" class="form-control">
+                            <select id="p-type"  class="form-control">
                                 <?php if($types != null):?>
                                     <?php foreach($types as $type):?>
                                         <option value="<?php echo $type->payment_type_id?>"><?php echo $type->payment_type_desc?></option>
@@ -159,14 +159,16 @@
 
                         <div class="form-group" id="monthly" style='display:none'> 
                             <label for="month">Year and Month of Reading</label>
-                            <input type="text" id="yearMonth" placeholder="ex. 2020-06" class="form-control" placeholder="" name="month" value="<?php echo set_value('month');?>" >   
+                            <input type="text" id="yearMonth" placeholder="ex. 2020-06" class="form-control" placeholder="" name="month" value="" >   
                         </div>
-                        <span class="text-danger"><?php echo form_error('month'); ?></span>
                         
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <input type="Submit" class="btn btn-primary" value="Submit">
-                        </div>
-                    </form>
+                        </div> -->
+                    <!-- </form> -->
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary" onclick="savePayment()">Submit</button>
                 </div>
             </div>
         </div>
@@ -188,8 +190,8 @@
     //     }
     // }
 
-    $("select#sel").change(function(){
-        var select = $("select#sel").val();
+    $("select#p-type").change(function(){
+        var select = $(this).val();
         
         if(select == 22){  
             $("#monthly").show();
@@ -207,6 +209,82 @@
     $("#paymentDate").datepicker({
         dateFormat : "yy-mm-dd"
     });
+
+    function savePayment(){
+
+        // console.log($("#ORnumber").val());
+
+        var orNum =$("#ORnumber").val();
+        var p_amount =$("#p-amount").val();
+        var dop =$("#paymentDate").val();
+        var p_method =$("#p-method").val();
+        var p_type =$("#p-type").val();
+        var p_mr =$("#yearMonth").val();
+        var accID = $("#acc-id").val();
+        var stat = $("#acc-status").val();
+
+
+        console.log(Number.isInteger(parseInt(p_amount)));
+        
+        if(orNum != "" && p_amount != ""){
+            if(Number.isInteger(parseInt(p_amount))){
+                if(p_type == 22){  
+                    data = {
+                        or_number           : orNum,
+                        amount              : p_amount,
+                        payment_type_id     : p_type,
+                        payment_method_id   : p_method,
+                        payment_date        : dop,
+                        reading_month       : p_mr,
+                        account_id          : accID,
+                        acc_status          : stat
+                    }
+                    
+                }
+                else{
+
+                    data = {
+                        or_number           : orNum,
+                        amount              : p_amount,
+                        payment_type_id     : p_type,
+                        payment_method_id   : p_method,
+                        payment_date        : dop,
+                        account_id          : accID,
+                        acc_status          : stat
+
+                    }
+                    
+                }
+
+                console.log(data);
+
+                $.ajax({
+                    type:"POST",
+                    data: data,
+                    url:'<?php echo base_url('cashier/doPay');?>',
+                    success: function(datas){
+                        var data = $.parseJSON(datas);
+                        console.log(datas)
+                        alert(data.msg);
+                        // location.reload();
+                        
+                    },
+                    error: function(data){
+                        console.log(data.responseText);
+                        alert(data.responseText);
+                        
+                        // console.log(data);
+                        // alert("Operation Failed");
+                    }
+                });
+            }else{
+                alert("Invalid Amount");
+            }
+        }else{
+            alert("Fillup All Fields");
+        }
+
+    }
 
     
 

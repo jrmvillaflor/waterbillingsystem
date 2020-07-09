@@ -58,13 +58,36 @@ class Cashier extends MY_Controller {
 
     function saveBulk(){
 
+        $tbl = 'bulk';
+        $pk = 'bulk_id';
+
+        $b = $this->checkID($tbl,$pk);
+
         $bulk = array(
-            "bulk_id" => 1,
+            "bulk_id" => "bulk".date('Y')."-".$b,
             "bulk_name" => $this->input->post("bulk_name"),
-            "bulk_cubic" => $this->input->post("bulk_cubic")
+            "bulk_cubic" => $this->input->post("bulk_cubic"),
+            "bulk_amount" => $this->input->post("bulk_amount")
         );
 
         $response = $this->CashierModel->saveBulk($bulk);
+
+        print_r(json_encode($response));
+    }
+
+    function editBulk(){
+
+        $bulk = array(
+            "bulk_id" => $this->input->post("bulk_id"),
+            "bulk_name" => $this->input->post("bulk_name"),
+            "bulk_cubic" => $this->input->post("bulk_cubic"),
+            "bulk_amount" => $this->input->post("bulk_amount")
+        );
+
+        $tbl = 'bulk';
+        $pk = 'bulk_id';
+
+        $response = $this->CashierModel->doUpdate($tbl,$bulk,$pk);
 
         print_r(json_encode($response));
     }
@@ -193,122 +216,7 @@ class Cashier extends MY_Controller {
                 $data['fees'] = $this->CashierModel->toPay($custAccId,$result[0]->account_status_desc);
                 $data['readings'] = $this->CashierModel->monthlyReading($custAccId);
                 
-                if($result[0]->account_status_desc == 'Active'){
-
-                    // getting Arrears 
-                    $data['records'] = $this->CashierModel->getRecords($custAccId);
-                    $data['payments'] = $this->CashierModel->payments($custAccId); 
-                    $data['OP'] = $this->CashierModel->getPenalty('penalty');
-
-                    foreach($data['records'] as $r => $record){
-                        $cr = count($data['records'])-1;
-                        
-                        $total = 0;
-            
-                        if($r == 0){
-                            $prev = $record->reading_value;
-                            $balance = 0;
-                        }else{
-                            if ($balance == 0) {
-                                $overdue = 0;
-                            }else{
-                                $overdue = round($balance,2);
-                            }
-                            if($overdue == 0){
-                                $penalty = 0;
-                            }else{
-                                $penalty = round($overdue * $data['OP'][0]->op_value,2);
-                            }
-            
-                            foreach ($data['payments'] as $p => $payment) {
-            
-                                $cp = count($data['payments'])-1;
-                                
-                                $con = $record->reading_value-$prev;
-                                $b = $this->calculateBill($data['records'][0]->account_type_code, $con);
-            
-                                $total = round($overdue+$b+$penalty,2);
-                                
-                                if($record->date_of_reading == $payment->date_of_reading ){
-                                    $amount = $payment->amount;
-                                    break;
-                                }
-                                else{
-                                    if ($cp == $p) {
-                                        $amount = 0;
-                                    }    
-                                }                           
-                            }
-            
-                            $balance = round($total - $amount,2);
-                            
-                            if($cr != $r){
-                                $arrears = $balance + round($balance * $data['OP'][0]->op_value,2);
-                                $data['arrears'] = $arrears;
-                            }
-                            
-                            $data['date'] = $record->date_of_reading;
-                            $prev = $record->reading_value;
-                        }
-            
-                    }
-
-                    $dd = $this->CashierModel->getDueDate('Billing Due');
-
-                    $data['due_date'] = $this->workingDays($data['date'],$dd[0]->due_days);
-
-                    $check_date = date('Y-m-d', strtotime($data['due_date']. ' + 3 days'));
-                    
-                    $for_disconn = "2020-9-15";// date now dapat ni 
-                    
-                    
-                    if($check_date == $for_disconn){
-
-                        $data['accountStatus'] = 'For Disconnection';
-
-                        $receipt = $this->CashierModel->getReciept($custAccId);
-
-                        if($receipt != null ){
-                            $matched = 0;
-                            $cr = count($receipt)-1;
-                            foreach($receipt as $r => $rep){
-                                foreach($data['readings'] as $reading){
-                                    if($rep->date_of_reading == $reading->date_of_reading){
-                                        $matched++;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        if($matched == 0){
-                            $data['accountStatus'] = 'For Disconnection';
-                        }
-                        else{
-                            $data['accountStatus'] = 'safe pa';
-                        }
-                    }
-                    else{
-                        $data['accountStatus'] = 'okay pa';
-                    }
-
-                    foreach ($data['readings'] as $key => $value) {
-                        if($key == 0){
-                            $pres = $value->reading_value;
-                        }
-                        else{
-                            $prev = $value->reading_value;
-                            
-                        }
-    
-                        
-                    }
-
-                    $consumed = $pres - $prev;
-                    $data['bill'] = $this->calculateBill($data['fees'][0]->account_type_code, $consumed);
-
-                }
-
+                
                 if($result[0]->account_status_desc == 'Deactivate'){
 
                     $data["bill"] = $data['fees'][0]->application_fee + $data['fees'][0]->advance_payments + $data['fees'][0]->connection_fee;
@@ -503,11 +411,325 @@ class Cashier extends MY_Controller {
 
             else:
 
-                echo 'bugok';
+            
 
             endif;
 
         endif;
+    }
+
+    function ts(){
+        $date = date("Y-m-d H:i:s");
+        // echo $date;
+        $r =$this->CashierModel->monthlyReading("20205212212020-POB");
+        print_r($r);
+    }
+
+
+    function doPay(){
+
+        $acc_status = $this->input->post("acc_status");
+
+        if($this->input->post("payment_type_id") == 11):
+            if($acc_status == "Deactivate"):
+
+                $payment = array(
+
+                    "OR_number" => $this->input->post("or_number"),
+                    "amount" => $this->input->post("amount"),
+                    "payment_type_id" => $this->input->post("payment_type_id"),
+                    "payment_method_id" => $this->input->post("payment_method_id"),
+                    "payment_date" => $this->input->post("payment_date"),
+                    "customer_account_id" => $this->input->post("account_id")
+                );
+
+                $tbl = "customer_payment";
+                $response = $this->CashierModel->doInsert($tbl, $payment);
+
+                if($response):
+                    
+                    $acc_stat = array(
+                        "account_status_date" => date("Y-m-d H:i:s"),
+                        "account_status_type_id" => 2,
+                        "customer_account_id" => $this->input->post("account_id")
+                    );
+
+
+                    $tbl = "account_status";
+                    $response = $this->CashierModel->doInsert($tbl, $acc_stat);
+
+                    if($response):
+                        print_r(json_encode(array("msg" => "Successful")));
+                    else: 
+                        print_r(json_encode(array("msg" => "Server Error")));
+                    endif;
+                else: 
+                    print_r(json_encode(array("msg" => "Server Error")));
+                endif;
+            else:
+                print_r(json_encode(array("msg" => "This Account is already registered")));
+            endif;
+        else:
+
+            $data['readings'] = $this->CashierModel->monthlyReading($this->input->post("account_id"));
+            
+            if($data['readings'] != null && count($data['readings']) != 1):
+
+                $cons = $data['readings'][0]->reading_value - $data['readings'][1]->reading_value;
+
+                $totalBill = $this->calculateBill($data['readings'][0]->account_type_code,$cons);
+
+                $data['fees'] = $this->CashierModel->toPay($this->input->post("account_id"),"Active");
+
+               
+                // getting Arrears 
+                $data['records'] = $this->CashierModel->getRecords($this->input->post("account_id"));
+                $data['payments'] = $this->CashierModel->payments($this->input->post("account_id")); 
+                $data['OP'] = $this->CashierModel->getPenalty('penalty');
+
+                $cr = count($data['records'])-1;
+                $cp = count($data['payments'])-1;
+
+
+                $balance = 0;
+                $total = 0;
+                $arrears = 0;
+                $data["arrears"] = 0;
+                foreach($data['records'] as $kr => $record):
+                    
+                    if($kr == 0):
+                        $prev = $record->reading_value;
+
+                    else:
+                        if($balance == 0):
+                            $overdue = 0;
+                        else:
+                            $overdue = round($balance,2);
+                        endif;
+
+                        if($overdue == 0):
+                            $penalty = 0;
+                        else:
+                            $penalty = round($overdue * $data['OP'][0]->op_value,2);
+                        endif;
+
+                        $con = $record->reading_value-$prev;
+                        // echo "<br>";
+                        $monthBill = $this->calculateBill($data['records'][0]->account_type_code, $con);
+                        $total = $monthBill+$overdue+$penalty;
+
+                        if($data['payments'] != null):
+                            foreach($data['payments'] as $kp => $payment):
+                                if($record->date_of_reading == $payment->date_of_reading ):
+                                    $amount = $payment->amount;
+                                    break;
+                                else:
+                                    if($cp == $kp):
+                                        $amount = 0;
+                                    endif;
+                                endif;
+                            endforeach;
+                        else:
+                            $amount = 0;
+                        endif;
+
+                        $balance = $total - $amount;
+
+                        if($cr != $kr):
+                            $arrears = $balance; 
+                            $data["arrears"] = $arrears;
+                        
+                        endif;
+
+                        // echo "<br>";
+                        
+                        $data['date'] = $record->date_of_reading;
+                        $prev = $record->reading_value;
+                    endif;
+                endforeach;
+
+                
+                $totalBill += round($data["arrears"] + $data["arrears"] * $data['OP'][0]->op_value,2);
+
+                
+
+                if($acc_status == "Active"):
+
+                    if($totalBill <= $this->input->post('amount')):
+                        $validate = true;
+                    else:
+                        if($data['readings'][0]->admin_permission == 1):
+                            $validate = true;
+                        else:
+                            $validate = false;
+                        endif;
+                    endif;
+                    
+                    if($validate):
+                        $payment = array(
+
+                            "OR_number" => $this->input->post("or_number"),
+                            "amount" => $this->input->post("amount"),
+                            "payment_type_id" => $this->input->post("payment_type_id"),
+                            "payment_method_id" => $this->input->post("payment_method_id"),
+                            "payment_date" => $this->input->post("payment_date"),
+                            "customer_account_id" => $this->input->post("account_id")
+                        );
+
+                        $tbl = "customer_payment";
+                        $response = $this->CashierModel->doInsert($tbl, $payment);
+
+                        if($response):
+                            
+                            $acc_stat = array(
+                                "account_status_date" => date("Y-m-d H:i:s"),
+                                "account_status_type_id" => 2,
+                                "customer_account_id" => $this->input->post("account_id")
+                            );
+
+
+                            $tbl = "account_status";
+                            $response = $this->CashierModel->doInsert($tbl, $acc_stat);
+
+                            if($response):
+                                
+                                $rDate = $this->input->post("reading_month");
+                                $reading = $this->CashierModel->meterReading(nice_date($rDate,'m'), nice_date($rDate,'Y'),$this->input->post("account_id"));
+
+                                if($reading != null):
+
+                                    
+                                    
+                                    $bill_record = array(
+                                        'cbrID' => 1,
+                                        'meter_reading_id' => $reading[0]->meter_reading_id,
+                                        'OR_number' => $this->input->post("or_number")
+
+                                    );
+
+                                    $tbl = 'customer_bill_record';
+
+                                    $response = $this->CashierModel->doInsert($tbl, $bill_record);
+                                    
+                                    if($response):
+                                        print_r(json_encode(array("msg" => "Successful")));
+                                    else: 
+                                        print_r(json_encode(array("msg" => "Server Error")));
+                                    endif;
+                                endif;
+                            endif;
+                        endif;
+                    else:
+                        
+                        print_r(json_encode(array("msg" => "Contact the admin to allow permission")));
+        
+                    endif;
+
+                elseif($acc_status == "Disconnected"):
+                    $data['reconn'] = $this->CashierModel->getPenalty('Reconnection fee');
+                    $totalBill += $data['reconn'][0]->op_value;
+
+                    // print_r(json_encode(array("msg" => $totalBill)));
+
+                    if($totalBill <= $this->input->post('amount')):
+                        $payment = array(
+
+                            "OR_number" => $this->input->post("or_number"),
+                            "amount" => $this->input->post("amount"),
+                            "payment_type_id" => $this->input->post("payment_type_id"),
+                            "payment_method_id" => $this->input->post("payment_method_id"),
+                            "payment_date" => $this->input->post("payment_date"),
+                            "customer_account_id" => $this->input->post("account_id")
+                        );
+
+                        $tbl = "customer_payment";
+                        $response = $this->CashierModel->doInsert($tbl, $payment);
+
+                        if($response):
+                            
+                            $acc_stat = array(
+                                "account_status_date" => date("Y-m-d H:i:s"),
+                                "account_status_type_id" => 5,
+                                "customer_account_id" => $this->input->post("account_id")
+                            );
+
+
+                            $tbl = "account_status";
+                            $response = $this->CashierModel->doInsert($tbl, $acc_stat);
+
+                            if($response):
+                                
+                                $rDate = $this->input->post("reading_month");
+                                $reading = $this->CashierModel->meterReading(nice_date($rDate,'m'), nice_date($rDate,'Y'),$this->input->post("account_id"));
+
+                                if($reading != null):
+
+                                    $bill_record = array(
+                                        'cbrID' => 1,
+                                        'meter_reading_id' => $reading[0]->meter_reading_id,
+                                        'OR_number' => $this->input->post("or_number")
+
+                                    );
+
+                                    $tbl = 'customer_bill_record';
+
+                                    $response = $this->CashierModel->doInsert($tbl, $bill_record);
+                                    
+                                    if($response):
+                                        print_r(json_encode(array("msg" => "Successful")));
+                                    else: 
+                                        print_r(json_encode(array("msg" => "Server Error")));
+                                    endif;
+                                endif;
+                            endif;
+                        endif;
+                    else:
+                        print_r(json_encode(array("msg" => "Not enough payment!!! \r\n Total Fee is ". $totalBill)));
+                    endif;
+
+                endif; 
+            else:
+                        
+                print_r(json_encode(array("msg" => "No Records Avaible")));
+  
+            endif;
+        endif;
+        
+        // if($type == 11):
+        //     if($status == "Active"):
+        //         //check payment amount
+        //         //insert customer_payment
+        //         //insert customer_bill
+        //         //update status to Active
+        //     else:
+        //         //Your account is already Active
+        //     endif;
+        // else: 
+        //     if($status == "Active"):
+        //         //check payment amount
+        //         if($permission):
+        //             //check permssion
+        //         endif;
+
+        //         if(true):
+        //             //insert customer_payment
+        //             //insert customer_bill
+        //         endif;
+        //     elseif($status == "For Disconnecton"):
+        //         //check payment amount
+        //         //insert customer_payment
+        //         //insert customer_bill
+        //         //update status to Active
+        //     elseif($status == "Disconnected"):
+        //         //full payment with reconn fee
+        //         //insert customer_payment
+        //         //insert customer_bill
+        //         //update status to For Reconnection
+        //     endif;
+        // endif;
+
+
+
     }
 
     public function calculateBill($type,$consumed){
@@ -744,5 +966,29 @@ class Cashier extends MY_Controller {
 
 
 
-    
+    public function checkID($table, $pkeyName){
+
+        $checkID = false;
+        while($checkID == false){
+            $id = $this->idGenerator();
+            $checkID = $this->CashierModel->idChecker($table, $pkeyName, $id);
+        }
+
+        return $id;
+
+    }
+
+
+    public function idGenerator()
+    {
+
+    	// $date = date('Y');
+		$uid = '';
+
+		while (	strlen($uid) != 6 ) {
+			$uid .= strval(rand(0,9));
+		}
+
+		return $uid;
+    }
 }

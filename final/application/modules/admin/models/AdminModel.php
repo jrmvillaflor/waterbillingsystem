@@ -38,7 +38,7 @@ class AdminModel extends CI_Model {
         $this->db->where('customer_account_id', $info["customer_account_id"]);
 
         if ($this->db->update('customer_account', $info)) {
-            return $response = array( 'msg' => 'success' );
+            return $response = array( 'msg' => 'Successful' );
             
     
         }
@@ -131,7 +131,7 @@ class AdminModel extends CI_Model {
         $this->db->where('accId', $acc['accId']);
 
         if ($this->db->update('account', $acc )) {
-            return $response = array( 'msg' => 'success' );
+            return $response = array( 'msg' => 'Successful' );
         }
         else{
             return $response = array( 'msg' => 'Server Error' );
@@ -139,9 +139,9 @@ class AdminModel extends CI_Model {
     }
 
 
-    function doInsert($tbl, $holi){
+    function doInsert($tbl, $data){
 
-        if ($this->db->insert($tbl, $holi)) {
+        if ($this->db->insert($tbl, $data)) {
             return TRUE;
         }
         else{
@@ -168,7 +168,7 @@ class AdminModel extends CI_Model {
         $this->db->join("account_type_fees", "cubic_range.cubic_range_id = account_type_fees.cubic_range_id");
         $this->db->join("account_type", "account_type_fees.account_type_code = account_type.account_type_code");
         $this->db->order_by("cubic_range_from", "asc");
-        $this->db->where("account_type_desc", $type);
+        $this->db->where("account_type.account_type_code", $type);
 
         $query = $this->db->get();
         return $query->result();
@@ -192,12 +192,26 @@ class AdminModel extends CI_Model {
     }
 
 
+    function updatePrice($tbl,$data,$pk,$pk2){
+
+        $this->db->where($pk, $data[$pk]);
+        $this->db->where($pk2, $data[$pk2]);
+
+        if ($this->db->update($tbl, $data )) {
+            return $response = array( 'msg' => 'Successful' );
+    
+        }
+        else{
+            return $response = array( 'msg' => 'Server Error' );
+        }
+    }
+
     function doDelete($id,$pk, $tbl){
 
         $this->db->where($pk, $id);
         $res = $this->db->delete($tbl);
         if ($res) {
-            return $response = array( 'msg' => 'success' );
+            return $response = array( 'msg' => 'Successful' );
     
         }
         else{

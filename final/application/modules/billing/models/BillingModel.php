@@ -40,9 +40,10 @@ class BillingModel extends CI_Model {
             AND accStat.customer_account_id = MaxStat.`customer_account_id`
         ) as accStat on accStat.customer_account_id = custAcc.customer_account_id
         JOIN account_status_type as accType on accType.account_status_type_id = accStat.account_status_type_id
-        WHERE accType.account_status_desc = "Active"
+        
 
         ');
+        // WHERE accType.account_status_desc = "Active"
 
         return $query->result();
 
@@ -70,7 +71,7 @@ class BillingModel extends CI_Model {
     }
 
 
-    public function customerInfo($id){
+    public function customerInfo($custId,$accId){
 
         $this->db->select('*');
         $this->db->from('customer');
@@ -78,8 +79,11 @@ class BillingModel extends CI_Model {
         $this->db->join('customer_account_address', 'customer_account.customer_account_id = customer_account_address.customer_account_id');
         $this->db->join('barangay', 'customer_account_address.brgy_id = barangay.brgy_id');
         $this->db->join('account_type', 'customer_account.account_type_code = account_type.account_type_code');
-        $this->db->where('customer_account.customer_id', $id);
-        
+        if($custId != null):
+            $this->db->where('customer_account.customer_id', $custId);
+        elseif($accId != null):
+            $this->db->where('customer_account.customer_account_id', $accId);
+        endif;    
         $query = $this->db->get();
         return $query->result();
     }
@@ -95,12 +99,19 @@ class BillingModel extends CI_Model {
         return $query->result();
     }
 
-    public function getAccounts($id){
+    public function getAccounts($id=null, $typeCode=null,$accID=null){
         
         $this->db->select('*');
         $this->db->from('customer_account');
         $this->db->join('account_type', 'customer_account.account_type_code = account_type.account_type_code');
-        $this->db->where('customer_account.customer_id', $id);
+        
+        if($typeCode != null):
+            $this->db->where('account_type.account_type_code', $typeCode);
+        elseif($id != null):
+            $this->db->where('customer_account.customer_id', $id);
+        elseif($accID != null):
+            $this->db->where('customer_account.customer_account_id', $accID);
+        endif;
         $query = $this->db->get();
         return $query->result();
     }
@@ -234,6 +245,34 @@ class BillingModel extends CI_Model {
 
     }
 
+    public function idChecker($tbl, $pk, $id){
+        $this->db->select($pk);
+        $this->db->from($tbl);
+        $this->db->where($pk, $id );
+        $query = $this->db->get()->result();
+        
+        if($query == null && $query != 0){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+
+    function doUpdate($tbl,$data,$pk){
+
+        $this->db->where($pk, $data[$pk]);
+
+        if ($this->db->update($tbl, $data )) {
+            return $response = array( 'msg' => 'Successful' );
+    
+        }
+        else{
+            return $response = array( 'msg' => 'Server Error' );
+
+        }
+    }
 
 
 

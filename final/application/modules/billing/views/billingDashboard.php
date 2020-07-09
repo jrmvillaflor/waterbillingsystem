@@ -35,9 +35,10 @@
             <table class="table table-stripe table-bordered" id="table">
                 <thead class="thead-dark">
                     <tr>
-                        <th scope="col" width=200>Customer Number</th>
+                        <th scope="col" width=200>Account Number</th>
                         <th scope="col">First Name</th>
                         <th scope="col">Last Name</th>
+                        <th>Status</th>
                         <th scope="col" width=320>
                             Action 
                             <!-- <span class="float-right"><input type="checkbox" name="select-all" id="select-all"></span> -->
@@ -48,15 +49,38 @@
                     <?php if($customers != null):?>
                         <?php foreach($customers as $customer):?>
                             <tr id="trbody">
-                                <th scope="row"><?php echo $customer->customer_id?></th>
+                                <th scope="row"><a href="<?php echo base_url('billing/ledger/').$customer->customer_account_id;?>"><?php echo $customer->customer_account_id?></a></th>
                                 <td><?php echo $customer->first_name?></td>
                                 <td><?php echo $customer->last_name?></td>
+                                <td><?php echo $customer->account_status_desc?></td>
                                 <td>
-                                    <a href="<?php echo base_url('billing/ledger/').$customer->customer_id;?>" class="btn btn-success">Ledger</a>
-                                    <a href="<?php echo base_url('billing/AddReading/').$customer->customer_id;?>" class="btn btn-info text-white">Reading</a>
-                                    <!-- <a href="<?php echo base_url('billing/customerBill/').$customer->customer_id;?>" class="btn btn-secondary text-white " id="view">View</a> -->
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" class="btn btn-secondary text-white ">View</button>
-                                    <input type="checkbox" name="checkbox-1" id="checkbox-1" class="float-right" />
+                                    <?php 
+                                        $dis;
+                                        switch ($customer->account_status_desc):
+                                        case "Deactivate":
+                                            $dis="disabled";
+                                            break;
+                                        case "Disconnected":
+                                            $dis="disabled";
+                                            break;
+                                        case "For Disconnection":
+                                            $dis="disabled";
+                                            break; 
+                                        case "For Reconnection":
+                                            $dis="disabled";
+                                            break;
+                                        default:
+                                            $dis="";
+                                            break;
+                                                
+                                        endswitch;
+                                        
+                                    ?>
+                                    <a href="<?php echo base_url('billing/AddReading/').$customer->customer_account_id;?>" class="btn btn-primary <?php echo $dis?>">Reading</a>
+                                    <a href="<?php echo base_url('billing/readingHistory/').$customer->customer_account_id;?>" class="btn btn-success <?php echo ($customer->account_status_desc=="Deactivate"?$dis:'')?>">Reading History</a>
+                                    <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" class="btn btn-secondary text-white ">View Bill</button> -->
+                                    <a href="<?php echo base_url('billing/customerBill/').$customer->customer_account_id;?>" class="btn btn-danger <?php echo ($customer->account_status_desc=="Deactivate"?$dis:'')?>">View Bill</a>
+                                    <!-- <input type="checkbox" name="checkbox-1" id="checkbox-1" class="float-right" /> -->
                                 </td>
                             </tr>
                         <?php endforeach;?>
